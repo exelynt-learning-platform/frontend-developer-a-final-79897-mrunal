@@ -13,7 +13,7 @@
         <div class="emp-toolbar-left">
           <div class="emp-search-box">
             <i class="bi bi-search emp-search-icon"></i>
-            <input type="text" class="emp-search-input" placeholder="Search..." (input)="onSearch($event)">
+            <input type="search" class="emp-search-input" placeholder="Search employee by ID" aria-label="Search employee by ID" (input)="onSearch($event)">
           </div>
 
           <select class="emp-select" [(ngModel)]="departmentFilter" (change)="onFilterChange()">
@@ -52,7 +52,7 @@
         <app-loader></app-loader>
       </div>
       <div *ngIf="error" class="emp-alert emp-alert-danger m-3">{{ error }}</div>
-      <app-no-data *ngIf="!(isLoading || isDepartmentsLoading) && total === 0" message="No employees found."></app-no-data>
+      <app-no-data *ngIf="!(isLoading || isDepartmentsLoading) && total === 0" [message]="searchQuery ? 'No employee found for this ID.' : 'No employees found.'"></app-no-data>
 
       <div class="emp-table-wrapper" *ngIf="!(isLoading || isDepartmentsLoading) && displayedEmployees.length > 0">
         <table class="emp-table">

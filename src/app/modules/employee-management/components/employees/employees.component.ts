@@ -60,6 +60,18 @@ export class EmployeeListComponent implements OnInit, OnDestroy {
     this.employeeFacade.error$
       .pipe(takeUntil(this.destroy$))
       .subscribe((error) => this.error = error || '');
+    this.employeeFacade.deleteSuccess$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(() => {
+        this.isDeleting = false;
+        this.toastService.showSuccess('Employee deleted successfully.');
+      });
+    this.employeeFacade.deleteFailure$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(() => {
+        this.isDeleting = false;
+        this.toastService.showError('Failed to delete employee. Please try again.');
+      });
 
     this.loadDepartments();
     this.employeeFacade.loadEmployees();
@@ -139,17 +151,9 @@ export class EmployeeListComponent implements OnInit, OnDestroy {
         return true;
       }
 
-      const fullName = `${emp.firstName ?? ''} ${emp.lastName ?? ''}`.toLowerCase();
-      const email = String(emp.email ?? '').toLowerCase();
-      const position = String(emp.position ?? '').toLowerCase();
       const id = String(emp.id ?? '');
 
-      return (
-        fullName.includes(searchTerm) ||
-        email.includes(searchTerm) ||
-        position.includes(searchTerm) ||
-        id.includes(searchTerm)
-      );
+      return id === searchTerm;
     });
 
     this.total = this.filteredEmployees.length;
@@ -211,8 +215,7 @@ export class EmployeeListComponent implements OnInit, OnDestroy {
     
     this.isDeleting = true;
     this.employeeFacade.deleteEmployee(this.employeeToDeleteId);
-    this.toastService.showSuccess('Employee deleted successfully.');
-    this.closeDeleteModal();
+    this.showDeleteModal = false;
   }
 
   cancelDelete(): void {
