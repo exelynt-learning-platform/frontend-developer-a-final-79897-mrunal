@@ -1,0 +1,22 @@
+<div class="app-layout">
+  <app-header (toggleSidebar)="onToggleDrawer()"></app-header>
+
+  <mat-sidenav-container class="sidenav-container" autosize>
+    <mat-sidenav
+      #drawer
+      class="app-sidenav"
+      [mode]="(isHandset$ | async) ? 'over' : 'side'"
+      [opened]="!(isHandset$ | async)"
+      role="navigation"
+      aria-label="Side navigation"
+    >
+      <app-sidebar (navigate)="onSideNavNavigate()"></app-sidebar>
+    </mat-sidenav>
+
+    <mat-sidenav-content class="main-content-container">
+      <main class="page-main-outlet">
+        <router-outlet></router-outlet>
+      </main>
+    </mat-sidenav-content>
+  </mat-sidenav-container>
+</div>

@@ -1,0 +1,113 @@
+.ems-sidebar {
+  width: 250px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background-color: #0f172a;
+  color: #94a3b8;
+  padding: 1.25rem 0;
+}
+
+.sidebar-header {
+  padding: 0 1.5rem 0.75rem 1.5rem;
+}
+
+.nav-section-title {
+  font-size: 0.725rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: #64748b;
+}
+
+.nav-list {
+  flex: 1;
+  padding-top: 0 !important;
+}
+
+.nav-link-item {
+  color: #94a3b8 !important;
+  border-radius: 8px;
+  margin: 0.2rem 0.75rem;
+  transition: all 0.15s ease-in-out;
+
+  &:hover {
+    background-color: #1e293b !important;
+    color: #ffffff !important;
+
+    .nav-icon {
+      color: #818cf8;
+    }
+  }
+
+  &.active-nav-link {
+    background-color: #312e81 !important;
+    color: #ffffff !important;
+
+    .nav-icon {
+      color: #a5b4fc;
+    }
+
+    .nav-title {
+      font-weight: 600;
+      color: #ffffff;
+    }
+  }
+
+  .nav-icon {
+    color: #64748b;
+    margin-right: 0.75rem;
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+  }
+
+  .nav-title {
+    font-size: 0.9rem;
+  }
+}
+
+.nav-badge {
+  background-color: #1e293b;
+  color: #94a3b8;
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0.15rem 0.5rem;
+  border-radius: 9999px;
+}
+
+.sidebar-footer {
+  padding: 1rem 1.25rem;
+  border-top: 1px solid #1e293b;
+}
+
+.app-version-box {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.5rem 0.75rem;
+  border-radius: 8px;
+  background-color: #1e293b;
+
+  .version-icon {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+    color: #10b981;
+  }
+
+  .version-info {
+    display: flex;
+    flex-direction: column;
+
+    .app-label {
+      font-size: 0.775rem;
+      font-weight: 600;
+      color: #e2e8f0;
+    }
+
+    .version-number {
+      font-size: 0.7rem;
+      color: #64748b;
+    }
+  }
+}

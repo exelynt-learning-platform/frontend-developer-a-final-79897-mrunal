@@ -1,0 +1,57 @@
+<div class="delete-dialog-wrapper">
+  <div class="dialog-header">
+    <div class="danger-avatar" aria-hidden="true">
+      <mat-icon>warning_amber</mat-icon>
+    </div>
+    <div class="header-texts">
+      <h2 mat-dialog-title class="dialog-title">Delete Employee?</h2>
+      <p class="dialog-subtitle">This action cannot be undone.</p>
+    </div>
+  </div>
+
+  <mat-dialog-content class="dialog-content">
+    <p class="confirmation-text">
+      Are you sure you want to delete
+      <strong class="highlight-name">{{ data.employee.name }}</strong>
+      (ID: #{{ data.employee.id }})?
+    </p>
+    <div class="employee-preview-box">
+      <div class="preview-field">
+        <span class="label">Email:</span>
+        <span class="value">{{ data.employee.email }}</span>
+      </div>
+      <div class="preview-field">
+        <span class="label">Country:</span>
+        <span class="value">{{ data.employee.country }}</span>
+      </div>
+    </div>
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end" class="dialog-actions">
+    <button
+      mat-button
+      type="button"
+      class="cancel-btn"
+      [disabled]="data.isDeleting"
+      (click)="onCancel()"
+    >
+      Cancel
+    </button>
+    <button
+      mat-flat-button
+      color="warn"
+      type="button"
+      class="delete-btn"
+      [disabled]="data.isDeleting"
+      (click)="onConfirm()"
+    >
+      <mat-progress-spinner
+        *ngIf="data.isDeleting"
+        mode="indeterminate"
+        diameter="18"
+        class="spinner-inline"
+      ></mat-progress-spinner>
+      <span>{{ data.isDeleting ? 'Deleting...' : 'Delete' }}</span>
+    </button>
+  </mat-dialog-actions>
+</div>

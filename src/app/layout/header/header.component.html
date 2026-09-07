@@ -1,0 +1,53 @@
+<mat-toolbar class="ems-header mat-elevation-z1">
+  <div class="header-left">
+    <button
+      mat-icon-button
+      type="button"
+      class="menu-toggle-btn"
+      (click)="onToggle()"
+      aria-label="Toggle navigation drawer"
+    >
+      <mat-icon>menu</mat-icon>
+    </button>
+
+    <div class="brand-box">
+      <div class="brand-logo" aria-hidden="true">
+        <mat-icon>badge</mat-icon>
+      </div>
+      <div class="brand-names">
+        <span class="brand-title">Employee Management System</span>
+        <span class="brand-badge">Enterprise HR</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="header-right">
+    <div class="stat-pill" aria-label="Total registered employees">
+      <mat-icon class="pill-icon">groups</mat-icon>
+      <span>{{ (totalEmployees$ | async) ?? 0 }} Staff</span>
+    </div>
+
+    <!-- User Profile Area (Requirement 13) -->
+    <button mat-button [matMenuTriggerFor]="profileMenu" class="user-profile-btn" aria-label="User profile options">
+      <div class="user-avatar" aria-hidden="true">HR</div>
+      <span class="user-name">HR Admin</span>
+      <mat-icon class="arrow-icon">expand_more</mat-icon>
+    </button>
+
+    <mat-menu #profileMenu="matMenu" xPosition="before">
+      <div class="profile-header-menu">
+        <strong>HR Administrator</strong>
+        <span class="profile-email">admin&#64;enterprise.internal</span>
+      </div>
+      <mat-divider></mat-divider>
+      <button mat-menu-item disabled>
+        <mat-icon>security</mat-icon>
+        <span>Role: Global Admin</span>
+      </button>
+      <button mat-menu-item disabled>
+        <mat-icon>check_circle</mat-icon>
+        <span>System Status: Online</span>
+      </button>
+    </mat-menu>
+  </div>
+</mat-toolbar>

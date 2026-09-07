@@ -1,0 +1,152 @@
+<div class="employee-page-container">
+  <!-- Page Header -->
+  <header class="page-header">
+    <div class="header-titles">
+      <h1 class="main-title">Employees</h1>
+      <p class="subtitle">Manage and monitor organization personnel records</p>
+    </div>
+    <div class="header-actions">
+      <button
+        mat-stroked-button
+        class="refresh-btn"
+        (click)="onRefresh()"
+        matTooltip="Reload data from server"
+        aria-label="Refresh employees list"
+      >
+        <mat-icon>refresh</mat-icon>
+        <span>Refresh</span>
+      </button>
+      <button
+        mat-flat-button
+        color="primary"
+        class="add-btn"
+        (click)="onAddEmployee()"
+        aria-label="Add new employee"
+      >
+        <mat-icon>add</mat-icon>
+        <span>Add Employee</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Summary Cards -->
+  <section class="summary-cards-row" aria-label="Employee summary statistics">
+    <mat-card class="stat-card">
+      <div class="stat-icon-box icon-indigo">
+        <mat-icon>people</mat-icon>
+      </div>
+      <div class="stat-info">
+        <span class="stat-label">Total Employees</span>
+        <h3 class="stat-value">{{ (totalEmployees$ | async) ?? 0 }}</h3>
+      </div>
+    </mat-card>
+
+    <mat-card class="stat-card">
+      <div class="stat-icon-box icon-emerald">
+        <mat-icon>public</mat-icon>
+      </div>
+      <div class="stat-info">
+        <span class="stat-label">Operating Countries</span>
+        <h3 class="stat-value">{{ (totalCountries$ | async) ?? 0 }}</h3>
+      </div>
+    </mat-card>
+
+    <mat-card class="stat-card">
+      <div class="stat-icon-box icon-blue">
+        <mat-icon>badge</mat-icon>
+      </div>
+      <div class="stat-info">
+        <span class="stat-label">Active Records</span>
+        <h3 class="stat-value">{{ (totalEmployees$ | async) ?? 0 }} Active</h3>
+      </div>
+    </mat-card>
+  </section>
+
+  <!-- Main Content Card -->
+  <mat-card class="table-card mat-elevation-z1">
+    <!-- Top Action Area: Search & Filter -->
+    <div class="table-top-bar">
+      <app-employee-search
+        [loading]="(searchLoading$ | async) || false"
+        [searchId]="currentSearchTerm"
+        (search)="onSearch($event)"
+        (clear)="onClearSearch()"
+      ></app-employee-search>
+    </div>
+
+    <!-- Search Active Indicator Banner -->
+    <div *ngIf="isSearching$ | async" class="search-banner">
+      <div class="banner-content">
+        <mat-icon class="banner-icon">filter_alt</mat-icon>
+        <span>Showing search results for Employee ID <strong>#{{ currentSearchTerm }}</strong></span>
+      </div>
+      <button mat-button class="clear-filter-btn" (click)="onClearSearch()">
+        <mat-icon>close</mat-icon>
+        <span>Clear Search</span>
+      </button>
+    </div>
+
+    <!-- State 1: Global Loading Skeleton -->
+    <app-loading-state
+      *ngIf="(loading$ | async) && !(isSearching$ | async)"
+      mode="table-skeleton"
+      [rows]="6"
+    ></app-loading-state>
+
+    <!-- State 2: Global Error State -->
+    <app-error-state
+      *ngIf="(error$ | async) && !(loading$ | async)"
+      [message]="(error$ | async) || 'Unable to load employees.'"
+      (retry)="onRefresh()"
+    ></app-error-state>
+
+    <!-- State 3: Search Loading Indicator -->
+    <app-loading-state
+      *ngIf="searchLoading$ | async"
+      mode="spinner"
+      message="Searching employee record by ID..."
+    ></app-loading-state>
+
+    <!-- State 4: Search Not Found / Error State -->
+    <div *ngIf="(searchError$ | async) && !(searchLoading$ | async)" class="search-empty-state">
+      <app-empty-state
+        icon="search_off"
+        title="Employee Not Found"
+        [message]="(searchError$ | async) || 'No employee found with this ID.'"
+        actionLabel="View All Employees"
+        actionIcon="arrow_back"
+        (actionClick)="onClearSearch()"
+      ></app-empty-state>
+    </div>
+
+    <!-- State 5: Single Searched Employee Found -->
+    <div *ngIf="(searchedEmployee$ | async) as foundEmp">
+      <app-employee-table
+        [employees]="[foundEmp]"
+        (edit)="onEditEmployee($event)"
+        (delete)="onDeleteEmployee($event)"
+      ></app-employee-table>
+    </div>
+
+    <!-- State 6: Regular Listing (No search active) -->
+    <ng-container *ngIf="!(isSearching$ | async) && !(loading$ | async) && !(error$ | async)">
+      <app-employee-table
+        *ngIf="((employees$ | async)?.length || 0) > 0"
+        [employees]="(employees$ | async) || []"
+        (edit)="onEditEmployee($event)"
+        (delete)="onDeleteEmployee($event)"
+      ></app-employee-table>
+
+      <!-- Empty State when 0 employees exist -->
+      <app-empty-state
+        *ngIf="((employees$ | async)?.length || 0) === 0"
+        icon="person_add"
+        title="No Employees Found"
+        message="Your employee database is currently empty. Start onboarding personnel."
+        actionLabel="Add First Employee"
+        actionIcon="add"
+        (actionClick)="onAddEmployee()"
+      ></app-empty-state>
+    </ng-container>
+  </mat-card>
+</div>

@@ -1,0 +1,37 @@
+.search-form {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.search-field {
+  min-width: 260px;
+  flex: 1;
+
+  .search-icon {
+    color: #64748b;
+    margin-right: 0.5rem;
+  }
+}
+
+.search-btn {
+  height: 48px;
+  border-radius: 8px;
+  font-weight: 500;
+  padding: 0 1.5rem;
+  min-width: 90px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.clear-btn {
+  height: 48px;
+  border-radius: 8px;
+  font-weight: 500;
+}
+
+.spinner {
+  display: inline-block;
+}

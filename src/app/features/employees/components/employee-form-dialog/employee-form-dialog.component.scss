@@ -1,0 +1,62 @@
+.dialog-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.5rem 1.5rem 1rem 1.5rem;
+  border-bottom: 1px solid #e2e8f0;
+  position: relative;
+}
+
+.header-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+
+  &.add-icon {
+    background-color: #eef2ff;
+    color: #4f46e5;
+  }
+
+  &.edit-icon {
+    background-color: #f0fdf4;
+    color: #16a34a;
+  }
+
+  mat-icon {
+    font-size: 24px;
+    width: 24px;
+    height: 24px;
+  }
+}
+
+.header-text {
+  flex: 1;
+
+  .title {
+    margin: 0 !important;
+    font-size: 1.25rem !important;
+    font-weight: 600 !important;
+    color: #0f172a !important;
+    line-height: 1.3 !important;
+    padding: 0 !important;
+  }
+
+  .subtitle {
+    margin: 0.2rem 0 0 0;
+    font-size: 0.85rem;
+    color: #64748b;
+  }
+}
+
+.close-btn {
+  color: #94a3b8;
+}
+
+.dialog-body {
+  padding: 1.5rem !important;
+  max-height: 80vh;
+}

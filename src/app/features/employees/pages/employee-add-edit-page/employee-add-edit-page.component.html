@@ -1,0 +1,41 @@
+<div class="page-container">
+  <div class="breadcrumb-bar">
+    <a routerLink="/employees" class="back-link">
+      <mat-icon>arrow_back</mat-icon>
+      <span>Back to Employees</span>
+    </a>
+  </div>
+
+  <mat-card class="form-card mat-elevation-z1">
+    <div class="card-header-bar">
+      <div class="icon-box" [ngClass]="isEdit ? 'edit-mode' : 'add-mode'">
+        <mat-icon>{{ isEdit ? 'edit' : 'person_add' }}</mat-icon>
+      </div>
+      <div class="title-meta">
+        <h1 class="page-title">{{ isEdit ? 'Edit Employee Details' : 'Add New Employee' }}</h1>
+        <p class="page-subtitle">
+          {{ isEdit ? 'Modify information for employee #' + employeeId : 'Enter complete details to onboard a new employee' }}
+        </p>
+      </div>
+    </div>
+
+    <div class="card-body">
+      <app-loading-state
+        *ngIf="isEdit && !employee && (loading$ | async)"
+        mode="spinner"
+        message="Loading employee details..."
+      ></app-loading-state>
+
+      <app-employee-form
+        *ngIf="!isEdit || employee"
+        [employee]="employee"
+        [countries]="(countries$ | async) || []"
+        [countriesLoading]="(countriesLoading$ | async) || false"
+        [submitting]="(submitting$ | async) || false"
+        [submitButtonLabel]="isEdit ? 'Update Employee' : 'Create Employee'"
+        (formSubmit)="onSubmit($event)"
+        (formCancel)="onCancel()"
+      ></app-employee-form>
+    </div>
+  </mat-card>
+</div>
