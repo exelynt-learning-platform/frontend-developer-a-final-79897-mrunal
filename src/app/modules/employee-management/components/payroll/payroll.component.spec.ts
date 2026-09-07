@@ -1,4 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { SharedModule } from '../../../../shared/shared.module';
 
 import { PayrollComponent } from './payroll.component';
 
@@ -8,6 +10,7 @@ describe('PayrollComponent', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule, SharedModule],
       declarations: [PayrollComponent]
     });
     fixture = TestBed.createComponent(PayrollComponent);

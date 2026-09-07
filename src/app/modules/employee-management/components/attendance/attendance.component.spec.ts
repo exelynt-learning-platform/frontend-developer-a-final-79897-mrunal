@@ -1,4 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { SharedModule } from '../../../../shared/shared.module';
 
 import { AttendanceComponent } from './attendance.component';
 
@@ -8,6 +10,7 @@ describe('AttendanceComponent', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule, SharedModule],
       declarations: [AttendanceComponent]
     });
     fixture = TestBed.createComponent(AttendanceComponent);
