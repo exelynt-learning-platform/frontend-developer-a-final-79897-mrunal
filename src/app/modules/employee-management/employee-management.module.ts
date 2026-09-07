@@ -2,6 +2,14 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { SharedModule } from '../../shared/shared.module';
 import { EmployeeManagementRoutingModule } from './employee-management-routing.module';
+import { EffectsModule } from '@ngrx/effects';
+import { StoreModule } from '@ngrx/store';
+import { employeeFeatureKey, employeeReducer } from './state/employee.reducer';
+import { EmployeeEffects } from './state/employee.effects';
+import { countryFeatureKey, countryReducer } from './state/country.reducer';
+import { CountryEffects } from './state/country.effects';
+import { EmployeeFacade } from './state/employee.facade';
+import { CountryFacade } from './state/country.facade';
 
 // Employee Components
 import { EmployeeListComponent } from './components/employees/employees.component';
@@ -35,7 +43,11 @@ import { SettingsComponent } from './components/settings/settings.component';
   imports: [
     CommonModule,
     SharedModule,
-    EmployeeManagementRoutingModule
-  ]
+    EmployeeManagementRoutingModule,
+    StoreModule.forFeature(employeeFeatureKey, employeeReducer),
+    StoreModule.forFeature(countryFeatureKey, countryReducer),
+    EffectsModule.forFeature([EmployeeEffects, CountryEffects])
+  ],
+  providers: [EmployeeFacade, CountryFacade]
 })
 export class EmployeeManagementModule { }

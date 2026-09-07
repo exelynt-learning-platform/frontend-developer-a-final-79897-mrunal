@@ -2,6 +2,7 @@ export const environment = {
   production: true,
   apiUrl: 'https://api.production.com/api',
   apiVersion: 'v1',
+  countryApiUrl: 'https://669b3f09276e45187d34eb4e.mockapi.io/api/v1/country',
   departmentApiUrl: 'https://6a5a0c92ad8332e75f021075.mockapi.io/departments',
   cacheDuration: 30 * 60 * 1000, // 30 minutes
   tokenKey: 'auth_token',

@@ -1,17 +1,18 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { EmployeeService } from '../../employee.service';
 import { IEmployee } from '../../../../interfaces/employee.interface';
 import { ToastService } from '../../../../core/services/toast.service';
 import { DepartmentService } from '../department/department.service';
 import { IDepartment } from '../../../../interfaces/department.interface';
+import { EmployeeFacade } from '../../state/employee.facade';
+import { Subject, takeUntil } from 'rxjs';
 
 @Component({
   selector: 'app-list',
   templateUrl: './employees.component.html',
   styleUrls: ['./employees.component.css']
 })
-export class EmployeeListComponent implements OnInit {
+export class EmployeeListComponent implements OnInit, OnDestroy {
   employees: IEmployee[] = [];
   filteredEmployees: IEmployee[] = [];
   displayedEmployees: IEmployee[] = [];
@@ -37,17 +38,36 @@ export class EmployeeListComponent implements OnInit {
   // populated from the Department API at runtime
   departmentsMap: { [key: number]: string } = {};
   departments: IDepartment[] = [];
+  private readonly destroy$ = new Subject<void>();
 
   constructor(
-    private employeeService: EmployeeService,
     private router: Router,
     private toastService: ToastService
-    ,
-    private departmentService: DepartmentService
+    , private departmentService: DepartmentService,
+    private employeeFacade: EmployeeFacade
   ) {}
 
   ngOnInit(): void {
+    this.employeeFacade.employees$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((employees) => {
+        this.employees = [...employees].sort((a, b) => Number(b.id) - Number(a.id));
+        this.applyFilters();
+      });
+    this.employeeFacade.loading$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((loading) => this.isLoading = loading);
+    this.employeeFacade.error$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((error) => this.error = error || '');
+
     this.loadDepartments();
+    this.employeeFacade.loadEmployees();
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   loadDepartments(): void {
@@ -66,7 +86,6 @@ export class EmployeeListComponent implements OnInit {
           }
         }
         this.isDepartmentsLoading = false;
-        this.loadEmployees();
       },
       error: (err) => {
         console.error('Failed to load departments', err);
@@ -74,26 +93,7 @@ export class EmployeeListComponent implements OnInit {
         this.departmentsMap = {};
         this.departmentsLoadingError = 'Failed to load departments.';
         this.isDepartmentsLoading = false;
-        // still load employees, show N/A when mapping missing
-        this.loadEmployees();
-      }
-    });
-  }
-
-  loadEmployees(): void {
-    this.isLoading = true;
-    this.error = '';
-
-    this.employeeService.getEmployees().subscribe({
-      next: (employees: IEmployee[]) => {
-        this.employees = employees.sort((a, b) => Number(b.id) - Number(a.id));
-        this.applyFilters();
-        this.isLoading = false;
-      },
-      error: (err) => {
-        console.error(err);
-        this.error = 'Failed to load employees';
-        this.isLoading = false;
+        // Employees remain independently available when departments fail.
       }
     });
   }
@@ -210,18 +210,9 @@ export class EmployeeListComponent implements OnInit {
     if (!this.employeeToDeleteId) return;
     
     this.isDeleting = true;
-    this.employeeService.deleteEmployee(this.employeeToDeleteId).subscribe({
-      next: () => {
-        this.toastService.showSuccess('Employee deleted successfully.');
-        this.closeDeleteModal();
-        this.loadEmployees();
-      },
-      error: (err) => {
-        console.error(err);
-        this.toastService.showError('Failed to delete employee. Please try again.');
-        this.closeDeleteModal();
-      }
-    });
+    this.employeeFacade.deleteEmployee(this.employeeToDeleteId);
+    this.toastService.showSuccess('Employee deleted successfully.');
+    this.closeDeleteModal();
   }
 
   cancelDelete(): void {

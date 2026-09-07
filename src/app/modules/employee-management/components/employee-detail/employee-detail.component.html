@@ -202,7 +202,17 @@
             </div>
             <div class="emp-form-group">
               <label class="emp-form-label">Country</label>
-              <input type="text" class="emp-form-control" formControlName="country">
+              <input *ngIf="isViewMode" type="text" class="emp-form-control" formControlName="country" readonly>
+              <select *ngIf="!isViewMode" class="emp-form-control" formControlName="country">
+                <option value="">Select country</option>
+                <option *ngFor="let country of countries" [value]="country.name">{{ country.name }}</option>
+              </select>
+            </div>
+            <div class="emp-form-group">
+              <label class="emp-form-label">District</label>
+              <input type="text" class="emp-form-control" formControlName="district"
+                [readonly]="isViewMode" [class.is-invalid]="isInvalid('district')">
+              <span class="emp-form-error" *ngIf="isInvalid('district')">District must be 50 characters or fewer.</span>
             </div>
             <div class="emp-form-group">
               <label class="emp-form-label">Pincode</label>

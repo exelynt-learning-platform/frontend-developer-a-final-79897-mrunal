@@ -1,6 +1,7 @@
 export const environment = {
   production: false,
-  employeeApiUrl: 'https://6a55c767e49d9eb2cc56067f.mockapi.io/api/v1/employees',
+  employeeApiUrl: 'https://669b3f09276e45187d34eb4e.mockapi.io/api/v1/employee',
+  countryApiUrl: 'https://669b3f09276e45187d34eb4e.mockapi.io/api/v1/country',
   departmentApiUrl: 'https://6a5a0c92ad8332e75f021075.mockapi.io/departments',
   cacheDuration: 5 * 60 * 1000, // 5 minutes
   tokenKey: 'auth_token',

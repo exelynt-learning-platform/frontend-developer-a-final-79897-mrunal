@@ -17,6 +17,7 @@ gender?: 'Male' | 'Female' | 'Other';
   city?: string;
   state?: string;
   country?: string;
+  district?: string;
   pincode?: string;
   notes?: string;
   profileImage?: string; // base64 data URL preview / upload payload

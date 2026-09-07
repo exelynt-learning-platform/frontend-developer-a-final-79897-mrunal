@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { EmployeeService } from '../../employee.service';
@@ -7,16 +7,21 @@ import { ToastService } from '../../../../core/services/toast.service';
 import { IEmployee } from '../../../../interfaces/employee.interface';
 import { IDepartment } from '../../../../interfaces/department.interface';
 import { DepartmentService } from '../department/department.service';
+import { CountryFacade } from '../../state/country.facade';
+import { EmployeeFacade } from '../../state/employee.facade';
+import { ICountry } from '../../../../interfaces/country.interface';
+import { Subject, takeUntil } from 'rxjs';
 
 @Component({
   selector: 'app-employee-detail',
   templateUrl: './employee-detail.component.html',
   styleUrls: ['./employee-detail.component.css']
 })
-export class EmployeeDetailComponent implements OnInit {
+export class EmployeeDetailComponent implements OnInit, OnDestroy {
   employee?: IEmployee;
   employeeForm!: FormGroup;
   departments: IDepartment[] = [];
+  countries: ICountry[] = [];
   isLoading = true;
   isSaving = false;
   error = '';
@@ -56,6 +61,7 @@ departmentsMap: { [key: number]: string } = {
   5: 'Finance',
   6: 'HR'
 };
+  private readonly destroy$ = new Subject<void>();
   
 
   constructor(
@@ -64,12 +70,18 @@ departmentsMap: { [key: number]: string } = {
     private fb: FormBuilder,
     private employeeService: EmployeeService,
     private toastService: ToastService,
-    private departmentService: DepartmentService
+    private departmentService: DepartmentService,
+    private countryFacade: CountryFacade,
+    private employeeFacade: EmployeeFacade
   ) {}
 
   ngOnInit(): void {
     this.initializeForm();
     this.loadDepartments();
+    this.countryFacade.countries$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((countries) => this.countries = countries);
+    this.countryFacade.loadCountries();
   
 
     const routePath = this.route.snapshot.routeConfig?.path;
@@ -77,11 +89,11 @@ departmentsMap: { [key: number]: string } = {
 
     this.isAddMode = routePath === 'employees/add';
     
-    if(routePath === 'employees/edit/:id' ){
+    if (routePath === 'employees/edit/:id') {
       this.isEditMode = true ;
     }
 
-    if(routePath === 'employees/view/:id' ){
+    if (routePath === 'employees/view/:id') {
       this.isViewMode = true ;
     }
 
@@ -89,9 +101,8 @@ departmentsMap: { [key: number]: string } = {
       this.isLoading = false;
       return;
     }
-debugger;
     const id = idParam ? Number(idParam) : null;
-    if (id && this.isEditMode || this.isViewMode) {
+  if (id && (this.isEditMode || this.isViewMode)) {
       this.loadEmployeeForEdit(id);
       return;
     }
@@ -105,14 +116,19 @@ debugger;
     this.isLoading = false;
   }
 
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
   initializeForm(): void {
     this.employeeForm = this.fb.group({
-      firstName: ['', Validators.required],
-      lastName: ['', Validators.required],
+      firstName: ['', [Validators.required, Validators.maxLength(50)]],
+      lastName: ['', [Validators.required, Validators.maxLength(50)]],
       dateOfBirth: [''],
       gender: [''],
-      email: ['', [Validators.required, Validators.email]],
-      phoneNumber: ['', [Validators.required, Validators.pattern(/^[0-9()+\-\s]*$/)]],
+      email: ['', [Validators.required, Validators.email, Validators.maxLength(254)]],
+      phoneNumber: ['', [Validators.required, Validators.maxLength(15), Validators.pattern(/^[0-9()+\-\s]*$/)]],
       status: ['Active', Validators.required],
       departmentId: ['', Validators.required],
       position: ['', Validators.required],
@@ -121,8 +137,9 @@ debugger;
       employmentType: ['Full Time'],
       address: [''],
       city: [''],
-      state: [''],
-      country: [''],
+      state: ['', Validators.maxLength(50)],
+      district: ['', Validators.maxLength(50)],
+      country: ['', Validators.maxLength(80)],
       pincode: [''],
       notes: [''],
       profileImage: ['']
@@ -228,8 +245,9 @@ debugger;
 
     if (this.isEditMode && this.employee?.id) {
       this.employeeService.updateEmployee(this.employee.id, employeePayload).subscribe({
-        next: () => {
+        next: (updatedEmployee) => {
           this.isSaving = false;
+          this.employeeFacade.syncEmployee(updatedEmployee);
           this.toastService.showSuccess('Employee updated successfully.');
           this.router.navigate(['/employee-management/employees']);
         },
@@ -243,8 +261,9 @@ debugger;
 
     if (this.isAddMode) {
       this.employeeService.createEmployee(employeePayload).subscribe({
-        next: () => {
+        next: (createdEmployee) => {
           this.isSaving = false;
+          this.employeeFacade.syncEmployee(createdEmployee);
           this.toastService.showSuccess('Employee created successfully.');
           this.router.navigate(['/employee-management/employees']);
         },

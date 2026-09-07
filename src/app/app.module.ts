@@ -7,6 +7,8 @@ import { AppComponent } from './app.component';
 // Core Module (Must be imported once at root level)
 import { CoreModule } from './core/core.module';
 import { SharedModule } from './shared/shared.module';
+import { EffectsModule } from '@ngrx/effects';
+import { StoreModule } from '@ngrx/store';
 
 @NgModule({
   declarations: [
@@ -16,6 +18,8 @@ import { SharedModule } from './shared/shared.module';
     BrowserModule,
     CoreModule,
     SharedModule,
+    StoreModule.forRoot({}),
+    EffectsModule.forRoot([]),
     AppRoutingModule
   ],
   providers: [],

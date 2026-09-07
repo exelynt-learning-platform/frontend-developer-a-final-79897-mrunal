@@ -9,7 +9,7 @@ import { IEmployee } from '../../interfaces/employee.interface';
 })
 export class EmployeeService {
 
-  private apiUrl = `${environment.employeeApiUrl}/users`;
+  private apiUrl = environment.employeeApiUrl;
 
   constructor(private http: HttpClient) {}
 
