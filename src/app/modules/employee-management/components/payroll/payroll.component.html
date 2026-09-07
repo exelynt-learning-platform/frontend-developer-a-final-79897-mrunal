@@ -1,0 +1,178 @@
+<div class="emp-wrapper">
+  <div class="emp-container">
+    
+    <!-- Header Section -->
+    <div class="emp-page-header">
+      <span class="emp-breadcrumb">HR / Payroll</span>
+      <h1 class="emp-page-title">Payroll Management</h1>
+      <p class="emp-page-subtitle">{{ totalItems }} payroll records {{ paginatedPayrolls.length ? 'multiple' : '0' }} departments</p>
+    </div>
+
+    <!-- Toolbar Section -->
+    <div class="emp-card">
+      <div class="emp-toolbar">
+        
+        <!-- Left: Search & Filter -->
+        <div class="emp-toolbar-left">
+          <!-- Search Input -->
+          <div class="emp-search-box">
+            <i class="bi bi-search emp-search-icon"></i>
+            <input 
+              type="text" 
+              class="emp-search-input"
+              placeholder="Search..." 
+              [(ngModel)]="searchTerm"
+              (input)="applyFilters()">
+          </div>
+
+          <!-- Status Filter -->
+          <select class="emp-select" [(ngModel)]="statusFilter" (change)="applyFilters()">
+            <option value="All">All Status</option>
+            <option value="Paid">Paid</option>
+            <option value="Pending">Pending</option>
+            <option value="Processing">Processing</option>
+          </select>
+
+          <!-- Month Picker -->
+          <input type="month" class="emp-select" [(ngModel)]="monthFilter" (change)="applyFilters()" style="min-width: 150px;">
+
+          <!-- Reset -->
+          <button class="emp-btn emp-btn-outline more-filter-btn" (click)="resetFilters()" *ngIf="searchTerm || statusFilter !== 'All' || monthFilter">
+            <i class="bi bi-x-circle"></i> Clear
+          </button>
+        </div>
+
+        <!-- Right: Add Button -->
+        <div class="emp-toolbar-right">
+          <button class="emp-btn emp-btn-outline export-btn" (click)="exportData()">
+            <i class="bi bi-download"></i> Export
+          </button>
+          <button class="emp-btn emp-btn-primary add-btn" (click)="navigateToAdd()">
+            <i class="bi bi-plus-lg"></i> Add
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Data Table Container -->
+    <div class="emp-card p-0 position-relative" style="overflow: hidden;">
+      <!-- Loader -->
+      <div *ngIf="isLoading" class="list-loader-container">
+        <app-loader></app-loader>
+      </div>
+
+      <!-- Empty State -->
+      <app-no-data *ngIf="!isLoading && paginatedPayrolls.length === 0" message="No payroll records found."></app-no-data>
+
+      <!-- Data Table -->
+      <div class="emp-table-wrapper" *ngIf="!isLoading && paginatedPayrolls.length > 0">
+        <table class="emp-table">
+          <thead>
+            <tr>
+              <th>Sr No</th>
+              <th (click)="sort('payrollId')" class="sortable">
+                Payroll ID <i class="bi bi-arrow-down-up"></i>
+              </th>
+              <th (click)="sort('employeeName')" class="sortable">
+                Employee <i class="bi bi-arrow-down-up"></i>
+              </th>
+              <th>Month</th>
+              <th>Basic Salary</th>
+              <th>Net Salary</th>
+              <th (click)="sort('status')" class="sortable">
+                Status <i class="bi bi-arrow-down-up"></i>
+              </th>
+              <th class="text-end" style="padding-right: 24px;">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let p of paginatedPayrolls; let i = index">
+              <td>{{ (currentPage - 1) * itemsPerPage + i + 1 }}</td>
+              <td><span class="emp-id-badge">{{ p.payrollId }}</span></td>
+              <td class="emp-col-employee">
+                <div class="emp-employee-cell">
+                  <div class="emp-user-info">
+                    <span class="emp-user-name">{{ p.employeeName }}</span>
+                    <span class="emp-user-email">{{ p.employeeId }} • {{ p.department }}</span>
+                  </div>
+                </div>
+              </td>
+              <td>{{ p.month | date:'MMM yyyy' }}</td>
+              <td style="font-weight: 500;">₹{{ p.basicSalary | number }}</td>
+              <td style="font-weight: 700; color: var(--primary-color);">₹{{ p.netSalary | number }}</td>
+              <td>
+                <span class="emp-badge" 
+                      [class.emp-badge-active]="p.status === 'Paid'"
+                      [class.emp-badge-inactive]="p.status === 'Pending'"
+                      [style.background]="p.status === 'Processing' ? '#eef2ff' : ''"
+                      [style.color]="p.status === 'Processing' ? '#4f46e5' : ''">
+                  {{ p.status }}
+                </span>
+              </td>
+              <td style="padding-right: 24px;">
+                <div class="emp-actions">
+                  <button class="emp-icon-btn" (click)="viewPayroll(p.id)" title="View Details">
+                    <i class="bi bi-eye"></i>
+                  </button>
+                  <button class="emp-icon-btn" (click)="editPayroll(p.id)" title="Edit Payroll">
+                    <i class="bi bi-pencil-square"></i>
+                  </button>
+                  <button class="emp-icon-btn emp-icon-btn-danger" (click)="confirmDelete(p)" title="Delete Payroll">
+                    <i class="bi bi-trash"></i>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Pagination -->
+    <div class="emp-pagination-container" *ngIf="totalPages > 1 && paginatedPayrolls.length > 0">
+      <div class="emp-pagination-info">
+        Showing <strong>{{ (currentPage - 1) * itemsPerPage + 1 }}</strong>-<strong>{{ min(currentPage * itemsPerPage, totalItems) }}</strong> of <strong>{{ totalItems }}</strong> entries
+      </div>
+      <ul class="emp-pagination">
+        <li>
+          <button class="emp-page-item" [class.disabled]="currentPage === 1" (click)="goToPage(currentPage - 1)">
+            <i class="bi bi-chevron-left"></i>
+          </button>
+        </li>
+        <li *ngFor="let page of pages">
+          <button class="emp-page-item" [class.active]="currentPage === page" (click)="goToPage(page)">
+            {{ page }}
+          </button>
+        </li>
+        <li>
+          <button class="emp-page-item" [class.disabled]="currentPage === totalPages" (click)="goToPage(currentPage + 1)">
+            <i class="bi bi-chevron-right"></i>
+          </button>
+        </li>
+      </ul>
+    </div>
+
+  </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal show" style="display: block; background: rgba(0,0,0,0.5);" *ngIf="showDeleteModal" tabindex="-1" role="dialog">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Delete Payroll</h5>
+        <button type="button" class="btn-close" (click)="cancelDelete()" [disabled]="isDeleting"></button>
+      </div>
+      <div class="modal-body">
+        <p>Are you sure you want to delete the payroll record for <strong>{{ payrollToDelete?.employeeName }}</strong>? This action cannot be undone.</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="cancelDelete()" [disabled]="isDeleting">Cancel</button>
+        <button type="button" class="btn btn-danger" (click)="deletePayroll()" [disabled]="isDeleting">
+          <span *ngIf="isDeleting" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+          {{ isDeleting ? 'Deleting...' : 'Delete' }}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

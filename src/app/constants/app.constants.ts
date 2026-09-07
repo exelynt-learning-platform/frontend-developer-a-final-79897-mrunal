@@ -1,0 +1,11 @@
+export const APP_CONSTANTS = {
+  APP_NAME: 'Employee Management System',
+  APP_VERSION: '1.0.0',
+  DEFAULT_PAGE_SIZE: 10,
+  DEFAULT_PAGE_SIZE_OPTIONS: [5, 10, 25, 50],
+  DEBOUNCE_TIME: 300,
+  CACHE_EXPIRY: 5 * 60 * 1000, // 5 minutes
+  SESSION_TIMEOUT: 30 * 60 * 1000, // 30 minutes
+  DEFAULT_THEME: 'light',
+  ANIMATION_DURATION: 300,
+};

@@ -1,0 +1,93 @@
+<div class="detail-container">
+
+  <!-- ============================================================
+       ADD DEPARTMENT MODE (new)
+  ============================================================ -->
+  <ng-container *ngIf="isAddMode || isEditMode || isViewMode">
+    <div class="emp-page-header">
+      <span class="emp-breadcrumb">HR / Departments / {{ isViewMode ? 'View' : (isEditMode ? 'Edit' : 'New') }}</span>
+      <h1 class="emp-page-title">{{ isViewMode ? 'View Department' : (isEditMode ? 'Edit Department' : 'Add Department') }}</h1>
+      <p class="emp-page-subtitle">{{ isViewMode ? 'View department information' : (isEditMode ? 'Update department information' : 'Create a new department record') }}</p>
+    </div>
+
+    <div *ngIf="submitError" class="emp-alert emp-alert-danger">{{ submitError }}</div>
+    <div *ngIf="successMessage" class="emp-alert emp-alert-success">{{ successMessage }}</div>
+
+    <form id="departmentForm" [formGroup]="departmentForm" (ngSubmit)="onSubmit()" class="add-emp-layout" novalidate>
+
+      <!-- ===== Sidebar: Status ===== -->
+      <div class="add-emp-sidebar">
+        <div class="emp-card">
+          <p class="add-emp-status-heading">Status</p>
+          <div class="add-emp-status-options">
+            <label class="add-emp-status-option"
+                   *ngFor="let s of statusOptions"
+                   [class.selected]="f['status'].value === s">
+              <input type="radio" name="status" [value]="s" formControlName="status" [attr.disabled]="isViewMode ? true : null">
+              {{ s }}
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== Main form sections ===== -->
+      <div class="add-emp-main">
+
+        <!-- Department Information -->
+        <div class="emp-card p-0">
+          <div class="add-emp-section-header">
+            <div class="add-emp-section-icon icon-blue"><i class="bi bi-building"></i></div>
+            <div>
+              <p class="add-emp-section-title">Department Information</p>
+              <p class="add-emp-section-subtitle">Basic department details</p>
+            </div>
+          </div>
+          <div class="emp-form-grid">
+            <div class="emp-form-group">
+              <label class="emp-form-label">Department Name <span class="emp-form-required" *ngIf="!isViewMode">*</span></label>
+              <input type="text" class="emp-form-control" [readonly]="isViewMode" formControlName="departmentName"
+                     [class.is-invalid]="isInvalid('departmentName')">
+              <span class="emp-form-error" *ngIf="isInvalid('departmentName')">Department name is required.</span>
+            </div>
+            <div class="emp-form-group">
+              <label class="emp-form-label">Department Code <span class="emp-form-required" *ngIf="!isViewMode">*</span></label>
+              <input type="text" class="emp-form-control" [readonly]="isViewMode" formControlName="departmentCode"
+                     [class.is-invalid]="isInvalid('departmentCode')">
+              <span class="emp-form-error" *ngIf="isInvalid('departmentCode')">Department code is required.</span>
+            </div>
+            <div class="emp-form-group">
+              <label class="emp-form-label">Head of Department <span class="emp-form-required" *ngIf="!isViewMode">*</span></label>
+              <input type="text" class="emp-form-control" [readonly]="isViewMode" formControlName="headOfDepartment"
+                     [class.is-invalid]="isInvalid('headOfDepartment')">
+              <span class="emp-form-error" *ngIf="isInvalid('headOfDepartment')">Head of department is required.</span>
+            </div>
+            <div class="emp-form-group">
+              <label class="emp-form-label">Total Employees <span class="emp-form-required" *ngIf="!isViewMode">*</span></label>
+              <input type="number" class="emp-form-control" [readonly]="isViewMode" formControlName="totalEmployees" min="0"
+                     [class.is-invalid]="isInvalid('totalEmployees')">
+              <span class="emp-form-error" *ngIf="isInvalid('totalEmployees')">Valid number is required.</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </form>
+
+    <div class="add-emp-footer-bar">
+      <span class="add-emp-required-note"><span class="emp-form-required" *ngIf="!isViewMode">* Required fields</span></span>
+      <div class="add-emp-footer-actions">
+        <button type="button" class="emp-btn emp-btn-outline" (click)="isViewMode ? goBack() : cancel()" [disabled]="isSaving">
+          {{ isViewMode ? 'Back' : 'Cancel' }}
+        </button>
+        <button *ngIf="isViewMode" type="button" class="emp-btn emp-btn-primary" (click)="editDepartment()">
+          Edit Department
+        </button>
+        <button *ngIf="!isViewMode" type="submit" form="departmentForm" class="emp-btn emp-btn-primary" [disabled]="departmentForm.invalid || isSaving">
+          <span *ngIf="isSaving" class="add-emp-spinner"></span>
+          {{ isSaving ? (isEditMode ? 'Updating...' : 'Saving...') : (isEditMode ? 'Update Department' : 'Save Department') }}
+        </button>
+      </div>
+    </div>
+  </ng-container>
+
+</div>

@@ -1,0 +1,174 @@
+<div class="detail-container">
+
+  <!-- ============================================================
+       ADD/EDIT LEAVE MODE
+  ============================================================ -->
+  <ng-container *ngIf="isAddMode || isEditMode || isViewMode">
+    <div class="emp-page-header">
+      <span class="emp-breadcrumb">Dashboard / Leave Management / {{ isViewMode ? 'View' : (isEditMode ? 'Edit' : 'New')
+        }}</span>
+      <h1 class="emp-page-title">{{ isViewMode ? 'View Leave' : (isEditMode ? 'Edit Leave' : 'Add Leave') }}</h1>
+      <p class="emp-page-subtitle">{{ isViewMode ? 'View leave information' : (isEditMode ? 'Update leave information' :
+        'Create a new leave record') }}</p>
+    </div>
+
+    <div *ngIf="submitError" class="emp-alert emp-alert-danger">{{ submitError }}</div>
+
+    <form id="leaveForm" [formGroup]="leaveForm" (ngSubmit)="onSubmit()" class="add-emp-layout" novalidate>
+
+      <!-- ===== Sidebar: Account Status (Reused for Leave Status) ===== -->
+      <div class="add-emp-sidebar">
+        <div class="emp-card">
+          <p class="add-emp-status-heading">Leave Status</p>
+          <div class="add-emp-status-options">
+            <label class="add-emp-status-option" *ngFor="let s of statusOptions"
+              [class.selected]="f['status'].value === s">
+              <input type="radio" name="status" [value]="s" formControlName="status"
+                [attr.disabled]="isViewMode ? true : null">
+              {{ s }}
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== Main form sections ===== -->
+      <div class="add-emp-main">
+
+        <!-- Leave Information -->
+        <div class="emp-card p-0">
+          <div class="add-emp-section-header">
+            <div class="add-emp-section-icon icon-blue"><i class="bi bi-calendar"></i></div>
+            <div>
+              <p class="add-emp-section-title">Leave Details</p>
+              <p class="add-emp-section-subtitle">Employee and leave duration</p>
+            </div>
+          </div>
+          <div class="emp-form-grid">
+
+            <div class="emp-form-group">
+              <label class="emp-form-label">
+                Employee <span class="emp-form-required" *ngIf="!isViewMode">*</span>
+              </label>
+
+              <input *ngIf="isViewMode" type="text" class="emp-form-control" [value]="getEmployeeName()" readonly>
+
+              <select *ngIf="!isViewMode" class="emp-form-control" formControlName="employeeId"
+                [class.is-invalid]="isInvalid('employeeId')" [disabled]="isEmployeesLoading">
+
+                <option value="">
+                  {{ isEmployeesLoading ? 'Loading...' : 'Select employee' }}
+                </option>
+
+                <option *ngFor="let emp of employees" [value]="emp.id">
+                  {{ emp.firstName }} {{ emp.lastName }}
+                </option>
+              </select>
+
+              <span class="emp-form-error" *ngIf="isInvalid('employeeId')">
+                Employee selection is required.
+              </span>
+            </div>
+
+            <div class="emp-form-group">
+              <label class="emp-form-label">Employee ID</label>
+              <input type="text" class="emp-form-control"
+                [value]="leaveForm.get('employeeId')?.value ? 'EMP-' + (leaveForm.get('employeeId')?.value | number:'4.0') : ''"
+                disabled>
+            </div>
+
+            <div class="emp-form-group">
+              <label class="emp-form-label">
+                Leave Type <span class="emp-form-required" *ngIf="!isViewMode">*</span>
+              </label>
+
+              <input *ngIf="isViewMode" type="text" class="emp-form-control" [value]="leaveForm.get('leaveType')?.value"
+                readonly>
+
+              <select *ngIf="!isViewMode" class="emp-form-control" formControlName="leaveType"
+                [class.is-invalid]="isInvalid('leaveType')">
+
+                <option value="">Select leave type</option>
+
+                <option *ngFor="let type of leaveTypeOptions" [value]="type">
+                  {{ type }}
+                </option>
+
+              </select>
+
+              <span class="emp-form-error" *ngIf="isInvalid('leaveType')">
+                Leave Type is required.
+              </span>
+            </div>
+
+            <div class="emp-form-group" style="grid-column: span 1; visibility: hidden; height: 0;"></div>
+            <!-- Spacer -->
+
+            <div class="emp-form-group">
+              <label class="emp-form-label">Start Date <span class="emp-form-required"
+                  *ngIf="!isViewMode">*</span></label>
+              <input type="date" class="emp-form-control" [readonly]="isViewMode" formControlName="startDate"
+                [class.is-invalid]="isInvalid('startDate')">
+              <span class="emp-form-error" *ngIf="isInvalid('startDate')">Start Date is required.</span>
+            </div>
+
+            <div class="emp-form-group">
+              <label class="emp-form-label">End Date <span class="emp-form-required"
+                  *ngIf="!isViewMode">*</span></label>
+              <input type="date" class="emp-form-control" [readonly]="isViewMode" formControlName="endDate"
+                [class.is-invalid]="isInvalid('endDate')">
+              <span class="emp-form-error" *ngIf="isInvalid('endDate')">
+                <span *ngIf="f['endDate'].errors?.['required']">End Date is required.</span>
+                <span *ngIf="leaveForm.hasError('dateRange') && !f['endDate'].errors?.['required']">End Date cannot be
+                  earlier than Start Date.</span>
+              </span>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Reason -->
+        <div class="emp-card p-0">
+          <div class="add-emp-section-header">
+            <div class="add-emp-section-icon icon-orange"><i class="bi bi-chat-text"></i></div>
+            <div>
+              <p class="add-emp-section-title">Leave Reason</p>
+              <p class="add-emp-section-subtitle">Details about the leave</p>
+            </div>
+          </div>
+          <div class="emp-form-grid">
+            <div class="emp-form-group add-emp-full-width">
+              <textarea class="emp-form-control add-emp-textarea" [readonly]="isViewMode" rows="4"
+                formControlName="reason" placeholder="Enter reason for leave..."
+                [class.is-invalid]="isInvalid('reason')"></textarea>
+              <span class="emp-form-error" *ngIf="isInvalid('reason')">
+                <span *ngIf="f['reason'].errors?.['required']">Reason is required.</span>
+                <span *ngIf="f['reason'].errors?.['minlength']">Reason must be at least 5 characters long.</span>
+              </span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </form>
+
+    <div class="add-emp-footer-bar">
+      <span class="add-emp-required-note"><span class="emp-form-required" *ngIf="!isViewMode">* Required
+          fields</span></span>
+      <div class="add-emp-footer-actions">
+        <button type="button" class="emp-btn emp-btn-outline" (click)="isViewMode ? goBack() : cancel()"
+          [disabled]="isSaving">
+          {{ isViewMode ? 'Back' : 'Cancel' }}
+        </button>
+        <button *ngIf="isViewMode" type="button" class="emp-btn emp-btn-primary" (click)="editLeave()">
+          Edit Leave
+        </button>
+        <button *ngIf="!isViewMode" type="submit" form="leaveForm" class="emp-btn emp-btn-primary"
+          [disabled]="leaveForm.invalid || isSaving">
+          <span *ngIf="isSaving" class="add-emp-spinner"></span>
+          {{ isSaving ? (isEditMode ? 'Updating...' : 'Saving...') : (isEditMode ? 'Update Leave' : 'Save Leave') }}
+        </button>
+      </div>
+    </div>
+  </ng-container>
+
+</div>

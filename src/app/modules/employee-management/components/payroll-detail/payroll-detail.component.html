@@ -1,0 +1,139 @@
+<div class="detail-container">
+
+  <!-- Header -->
+  <div class="emp-page-header">
+    <span class="emp-breadcrumb">HR / Payroll / {{ isViewMode ? 'View' : (isEditMode ? 'Edit' : 'New') }}</span>
+    <h1 class="emp-page-title">{{ isViewMode ? 'View Payroll' : (isEditMode ? 'Edit Payroll' : 'Add Payroll') }}</h1>
+    <p class="emp-page-subtitle">
+      {{ isViewMode ? '' : 'Enter employee compensation details.' }}
+    </p>
+  </div>
+
+  <div *ngIf="isLoading" class="list-loader-container mt-4">
+    <app-loader></app-loader>
+  </div>
+
+  <form *ngIf="!isLoading" [formGroup]="payrollForm" (ngSubmit)="onSubmit()" class="add-emp-layout" novalidate>
+    
+    <!-- LEFT SIDEBAR: Employee Selection & Details -->
+    <div class="add-emp-sidebar">
+      <div class="emp-card p-0">
+        <div class="add-emp-section-header">
+          <div class="add-emp-section-icon icon-blue"><i class="bi bi-person-badge"></i></div>
+          <div>
+            <p class="add-emp-section-title">Employee Details</p>
+          </div>
+        </div>
+        
+        <div class="emp-form-grid" style="padding: 24px;">
+          <!-- Dropdown for Add/Edit -->
+          <div class="emp-form-group add-emp-full-width" *ngIf="!isViewMode">
+            <label class="emp-form-label">Select Employee <span class="emp-form-required">*</span></label>
+            <select class="emp-form-control" formControlName="employeeId" (change)="onEmployeeSelect($event)"
+              [class.is-invalid]="payrollForm.get('employeeId')?.invalid && payrollForm.get('employeeId')?.touched">
+              <option value="" disabled selected>-- Select Employee --</option>
+              <option *ngFor="let emp of employees" [value]="emp.id">{{ emp.firstName }} {{ emp.lastName }} ({{ emp.id }})</option>
+            </select>
+          </div>
+
+          <!-- Readonly for View Mode -->
+          <div class="emp-form-group add-emp-full-width" *ngIf="isViewMode">
+            <label class="emp-form-label">Employee ID</label>
+            <input type="text" class="emp-form-control" [value]="payrollForm.get('employeeId')?.value" readonly>
+          </div>
+          <div class="emp-form-group add-emp-full-width">
+            <label class="emp-form-label">Employee Name</label>
+            <input type="text" class="emp-form-control bg-light" formControlName="employeeName" readonly>
+          </div>
+          <div class="emp-form-group add-emp-full-width">
+            <label class="emp-form-label">Department</label>
+            <input type="text" class="emp-form-control bg-light" formControlName="department" readonly>
+          </div>
+          <div class="emp-form-group add-emp-full-width" style="margin-bottom: 0;">
+            <label class="emp-form-label">Designation</label>
+            <input type="text" class="emp-form-control bg-light" formControlName="designation" readonly>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT MAIN: Payroll Details -->
+    <div class="add-emp-main">
+      <div class="emp-card p-0">
+        <div class="add-emp-section-header">
+          <div class="add-emp-section-icon icon-green"><i class="bi bi-cash-stack"></i></div>
+          <div>
+            <p class="add-emp-section-title">Compensation & Calculations</p>
+            <p class="add-emp-section-subtitle">Manage salary and status</p>
+          </div>
+        </div>
+
+        <div class="emp-form-grid" style="padding: 24px;">
+          <div class="emp-form-group">
+            <label class="emp-form-label">Payroll ID</label>
+            <input type="text" class="emp-form-control" formControlName="payrollId">
+          </div>
+          <div class="emp-form-group">
+            <label class="emp-form-label">Month <span *ngIf="!isViewMode" class="emp-form-required">*</span></label>
+            <input type="month" class="emp-form-control" formControlName="month" [readonly]="isViewMode">
+          </div>
+
+          <div class="emp-form-group">
+            <label class="emp-form-label">Basic Salary (₹) <span *ngIf="!isViewMode" class="emp-form-required">*</span></label>
+            <input type="number" class="emp-form-control" formControlName="basicSalary" [readonly]="isViewMode">
+          </div>
+          <div class="emp-form-group">
+            <label class="emp-form-label">Allowance (₹)</label>
+            <input type="number" class="emp-form-control" formControlName="allowance" [readonly]="isViewMode">
+          </div>
+          
+          <div class="emp-form-group">
+            <label class="emp-form-label">Bonus (₹)</label>
+            <input type="number" class="emp-form-control" formControlName="bonus" [readonly]="isViewMode">
+          </div>
+          <div class="emp-form-group">
+            <label class="emp-form-label">Deduction (₹)</label>
+            <input type="number" class="emp-form-control" formControlName="deduction" [readonly]="isViewMode">
+          </div>
+
+          <!-- Net Salary Highlight -->
+          <div class="emp-form-group add-emp-full-width" style="background: #f8fafc; padding: 16px; border-radius: 8px; border: 1px solid var(--border-color); margin-top: 8px;">
+            <label class="emp-form-label" style="font-weight: 600; color: var(--text-dark); margin-bottom: 8px;">Net Salary (₹)</label>
+            <div style="font-size: 1.5rem; font-weight: 700; color: var(--primary-color);">
+              ₹ {{ payrollForm.get('netSalary')?.value | number:'1.2-2' }}
+            </div>
+          </div>
+
+          <div class="emp-form-group" style="margin-top: 16px;">
+            <label class="emp-form-label">Status <span *ngIf="!isViewMode" class="emp-form-required">*</span></label>
+            <select *ngIf="!isViewMode" class="emp-form-control" formControlName="status">
+              <option *ngFor="let stat of statusOptions" [value]="stat">{{ stat }}</option>
+            </select>
+            <input *ngIf="isViewMode" type="text" class="emp-form-control" [value]="payrollForm.get('status')?.value" readonly>
+          </div>
+          <div class="emp-form-group add-emp-full-width">
+            <label class="emp-form-label">Remarks</label>
+            <textarea class="emp-form-control add-emp-textarea" formControlName="remarks" rows="2" [readonly]="isViewMode"></textarea>
+          </div>
+        </div>
+      </div>
+    </div>
+  </form>
+
+  <!-- Footer Actions -->
+  <div class="add-emp-footer-bar" *ngIf="!isLoading">
+    <span class="add-emp-required-note" *ngIf="!isViewMode"><span class="emp-form-required">*</span> Required fields</span>
+    <span *ngIf="isViewMode"></span>
+    
+    <div class="add-emp-footer-actions">
+      <button type="button" class="emp-btn emp-btn-outline" (click)="cancel()" [disabled]="isSaving">
+        {{ isViewMode ? 'Back' : 'Cancel' }}
+      </button>
+      <button *ngIf="!isViewMode" type="submit" class="emp-btn emp-btn-primary" (click)="onSubmit()" [disabled]="isSaving || payrollForm.invalid">
+        <span *ngIf="isSaving" class="add-emp-spinner"></span>
+        {{ isSaving ? (isEditMode ? 'Updating...' : 'Saving...') : (isEditMode ? 'Update Payroll' : 'Save Payroll') }}
+      </button>
+    </div>
+  </div>
+
+</div>

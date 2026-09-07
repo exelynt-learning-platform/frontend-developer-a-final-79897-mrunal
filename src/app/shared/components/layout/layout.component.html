@@ -1,0 +1,25 @@
+<!-- ═══════════════════════════════════════
+     APP LAYOUT – Shell for Home Module
+     ═══════════════════════════════════════ -->
+<div class="ems-layout-wrapper">
+  
+  <!-- Fixed Navbar -->
+  <app-navbar (toggleSidebar)="toggleSidebar()"></app-navbar>
+
+  <div class="ems-layout-body">
+    <!-- Fixed Sidebar -->
+    <app-sidebar [isCollapsed]="sidebarCollapsed" (navigate)="onSidebarNavigate()"></app-sidebar>
+
+    <!-- Main Content Area -->
+    <main class="ems-layout-main" [class.sidebar-collapsed]="sidebarCollapsed">
+      <!-- Router outlet for page content (Dashboard, Employees, etc) -->
+      <div class="ems-content-container">
+        <router-outlet></router-outlet>
+      </div>
+    </main>
+  </div>
+
+  <!-- Persistent Footer – fixed full-width at the bottom of viewport -->
+  <app-footer [class.sidebar-collapsed]="sidebarCollapsed"></app-footer>
+
+</div>

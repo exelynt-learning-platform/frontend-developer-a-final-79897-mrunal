@@ -1,0 +1,248 @@
+<div class="detail-container">
+
+  <!-- ============================================================
+       ADD EMPLOYEE MODE (new)
+  ============================================================ -->
+  <ng-container *ngIf="isAddMode || isEditMode || isViewMode">
+    <div class="emp-page-header">
+      <span class="emp-breadcrumb">HR / Employees / {{ isEditMode ? 'Edit' : 'New' }}</span>
+      <h1 class="emp-page-title">{{ isEditMode ? 'Edit Employee' : 'Add Employee' }}</h1>
+      <p class="emp-page-subtitle">{{ isEditMode ? 'Update employee information' : 'Create a new employee record' }}</p>
+    </div>
+
+    <div *ngIf="submitError" class="emp-alert emp-alert-danger">{{ submitError }}</div>
+    <div *ngIf="successMessage" class="emp-alert emp-alert-success">{{ successMessage }}</div>
+
+    <form id="employeeForm" [formGroup]="employeeForm" (ngSubmit)="onSubmit()" class="add-emp-layout" novalidate>
+
+      <!-- ===== Sidebar: Photo + Account Status ===== -->
+      <div class="add-emp-sidebar">
+
+        <div class="emp-card add-emp-photo-card">
+          <div class="add-emp-photo-upload" (click)="fileInput.click()">
+            <img *ngIf="imagePreview" [src]="imagePreview" alt="Profile preview">
+            <i *ngIf="!imagePreview" class="bi bi-upload add-emp-photo-icon"></i>
+          </div>
+          <input #fileInput type="file" [readonly]="isViewMode" accept="image/png,image/jpeg" hidden
+            (change)="onFileSelected($event)">
+          <p class="add-emp-photo-title">Profile Photo</p>
+          <p class="add-emp-photo-hint">JPG or PNG, up to 2MB.<br>Square image recommended.</p>
+          <button type="button" class="emp-btn emp-btn-outline add-emp-btn-block" (click)="fileInput.click()">
+            Upload Photo
+          </button>
+        </div>
+
+        <div class="emp-card">
+          <p class="add-emp-status-heading">Account Status</p>
+          <div class="add-emp-status-options">
+            <label class="add-emp-status-option" *ngFor="let s of statusOptions"
+              [class.selected]="f['status'].value === s">
+              <input type="radio" name="status" [value]="s" formControlName="status">
+              {{ s }}
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== Main form sections ===== -->
+      <div class="add-emp-main">
+
+        <!-- Personal Information -->
+        <div class="emp-card p-0">
+          <div class="add-emp-section-header">
+            <div class="add-emp-section-icon icon-blue"><i class="bi bi-person"></i></div>
+            <div>
+              <p class="add-emp-section-title">Personal Information</p>
+              <p class="add-emp-section-subtitle">Basic identity details</p>
+            </div>
+          </div>
+          <div class="emp-form-grid">
+            <div class="emp-form-group">
+              <label class="emp-form-label">First name <span class="emp-form-required">*</span></label>
+              <input type="text" class="emp-form-control" [readonly]="isViewMode" formControlName="firstName"
+                [class.is-invalid]="isInvalid('firstName')">
+              <span class="emp-form-error" *ngIf="isInvalid('firstName')">First name is required.</span>
+            </div>
+            <div class="emp-form-group">
+              <label class="emp-form-label">Last name <span class="emp-form-required">*</span></label>
+              <input type="text" class="emp-form-control" [readonly]="isViewMode" formControlName="lastName"
+                [class.is-invalid]="isInvalid('lastName')">
+              <span class="emp-form-error" *ngIf="isInvalid('lastName')">Last name is required.</span>
+            </div>
+            <div class="emp-form-group">
+              <label class="emp-form-label">Date of birth</label>
+              <input type="date" class="emp-form-control" [readonly]="isViewMode" formControlName="dateOfBirth">
+            </div>
+            <div class="emp-form-group">
+              <label class="emp-form-label">Gender</label>
+
+              <input *ngIf="isViewMode" type="text" class="emp-form-control" [value]="employeeForm.get('gender')?.value"
+                readonly>
+
+              <select *ngIf="!isViewMode" class="emp-form-control" formControlName="gender">
+                <option value="">Select gender</option>
+                <option *ngFor="let g of genderOptions" [value]="g">{{ g }}</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- Contact Information -->
+        <div class="emp-card p-0">
+          <div class="add-emp-section-header">
+            <div class="add-emp-section-icon icon-green"><i class="bi bi-envelope"></i></div>
+            <div>
+              <p class="add-emp-section-title">Contact Information</p>
+              <p class="add-emp-section-subtitle">How to reach this employee</p>
+            </div>
+          </div>
+          <div class="emp-form-grid">
+            <div class="emp-form-group">
+              <label class="emp-form-label">Email address <span class="emp-form-required">*</span></label>
+              <input type="email" class="emp-form-control" formControlName="email"
+                [class.is-invalid]="isInvalid('email')">
+              <span class="emp-form-error" *ngIf="isInvalid('email') && f['email'].errors?.['required']">Email is
+                required.</span>
+              <span class="emp-form-error" *ngIf="isInvalid('email') && f['email'].errors?.['email']">Enter a valid
+                email address.</span>
+            </div>
+            <div class="emp-form-group">
+              <label class="emp-form-label">Mobile number <span class="emp-form-required">*</span></label>
+              <input type="text" maxlength="10" class="emp-form-control" formControlName="phoneNumber"
+                [class.is-invalid]="isInvalid('phoneNumber')">
+              <span class="emp-form-error" *ngIf="isInvalid('phoneNumber')">Enter a valid phone number.</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Employment Information -->
+        <div class="emp-card p-0">
+          <div class="add-emp-section-header">
+            <div class="add-emp-section-icon icon-purple"><i class="bi bi-briefcase"></i></div>
+            <div>
+              <p class="add-emp-section-title">Employment Information</p>
+              <p class="add-emp-section-subtitle">Role, team &amp; compensation</p>
+            </div>
+          </div>
+          <div class="emp-form-grid">
+            <div class="emp-form-group">
+              <label class="emp-form-label">Employee ID</label>
+              <input type="text" class="emp-form-control"
+                [value]="isEditMode && employee && employee.id ? 'EMP-' + (employee.id | number:'4.0') : 'Auto-generated on save'"
+                disabled>
+            </div>
+            <div class="emp-form-group">
+              <label class="emp-form-label">Department <span class="emp-form-required">*</span></label>
+              <input *ngIf="isViewMode" type="text" class="emp-form-control" [value]="getDepartmentName()" readonly>
+              <select *ngIf="!isViewMode" class="emp-form-control" formControlName="departmentId">
+                <option value="">{{ isDepartmentsLoading ? 'Loading departments...' : (departments.length ? 'Select
+                  department' : 'No departments available') }}</option>
+                <option *ngFor="let d of departments" [value]="d.id">{{ d.departmentName }}</option>
+              </select>
+              <span class="emp-form-error" *ngIf="departmentsLoadingError">{{ departmentsLoadingError }}</span>
+              <span class="emp-form-error" *ngIf="!departmentsLoadingError && isInvalid('departmentId')">Department is
+                required.</span>
+            </div>
+            <div class="emp-form-group">
+              <label class="emp-form-label">Designation <span class="emp-form-required">*</span></label>
+              <input type="text" class="emp-form-control" formControlName="position"
+                [class.is-invalid]="isInvalid('position')">
+              <span class="emp-form-error" *ngIf="isInvalid('position')">Designation is required.</span>
+            </div>
+            <div class="emp-form-group">
+              <label class="emp-form-label">Salary <span class="emp-form-required">*</span></label>
+              <input type="number" class="emp-form-control" formControlName="salary" min="0"
+                [class.is-invalid]="isInvalid('salary')">
+              <span class="emp-form-error" *ngIf="isInvalid('salary')">Enter a valid salary.</span>
+            </div>
+            <div class="emp-form-group">
+              <label class="emp-form-label">Joining date <span class="emp-form-required">*</span></label>
+              <input type="date" class="emp-form-control" formControlName="hireDate"
+                [class.is-invalid]="isInvalid('hireDate')">
+              <span class="emp-form-error" *ngIf="isInvalid('hireDate')">Joining date is required.</span>
+            </div>
+            <div class="emp-form-group">
+              <label class="emp-form-label">Employment Type</label>
+
+              <input *ngIf="isViewMode" type="text" class="emp-form-control"
+                [value]="employeeForm.get('employmentType')?.value" readonly>
+
+              <select *ngIf="!isViewMode" class="emp-form-control" formControlName="employmentType">
+
+                <option *ngFor="let t of employmentTypeOptions" [value]="t">
+                  {{ t }}
+                </option>
+
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- Address Information -->
+        <div class="emp-card p-0">
+          <div class="add-emp-section-header">
+            <div class="add-emp-section-icon icon-orange"><i class="bi bi-geo-alt"></i></div>
+            <div>
+              <p class="add-emp-section-title">Address Information</p>
+              <p class="add-emp-section-subtitle">Where this employee lives</p>
+            </div>
+          </div>
+          <div class="emp-form-grid">
+            <div class="emp-form-group add-emp-full-width">
+              <label class="emp-form-label">Address</label>
+              <input type="text" class="emp-form-control" formControlName="address">
+            </div>
+            <div class="emp-form-group">
+              <label class="emp-form-label">City</label>
+              <input type="text" class="emp-form-control" formControlName="city">
+            </div>
+            <div class="emp-form-group">
+              <label class="emp-form-label">State</label>
+              <input type="text" class="emp-form-control" formControlName="state">
+            </div>
+            <div class="emp-form-group">
+              <label class="emp-form-label">Country</label>
+              <input type="text" class="emp-form-control" formControlName="country">
+            </div>
+            <div class="emp-form-group">
+              <label class="emp-form-label">Pincode</label>
+              <input type="text" class="emp-form-control" formControlName="pincode">
+            </div>
+          </div>
+        </div>
+
+        <!-- Additional Notes -->
+        <div class="emp-card p-0">
+          <div class="add-emp-section-header">
+            <div class="add-emp-section-icon icon-blue"><i class="bi bi-journal-text"></i></div>
+            <div>
+              <p class="add-emp-section-title">Additional Notes</p>
+              <p class="add-emp-section-subtitle">Anything else worth recording</p>
+            </div>
+          </div>
+          <div class="emp-form-grid">
+            <div class="emp-form-group add-emp-full-width">
+              <textarea class="emp-form-control add-emp-textarea" rows="4" formControlName="notes"></textarea>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </form>
+
+    <div class="add-emp-footer-bar">
+      <span class="add-emp-required-note"><span class="emp-form-required">*</span> Required fields</span>
+      <div class="add-emp-footer-actions">
+        <button type="button" class="emp-btn emp-btn-outline" (click)="cancel()" [disabled]="isSaving">
+          Cancel
+        </button>
+        <button type="submit" form="employeeForm" class="emp-btn emp-btn-primary"
+          [disabled]="employeeForm.invalid || isSaving">
+          <span *ngIf="isSaving" class="add-emp-spinner"></span>
+          {{ isSaving ? (isEditMode ? 'Updating...' : 'Saving...') : (isEditMode ? 'Update Employee' : 'Save Employee')
+          }}
+        </button>
+      </div>
+    </div>
+  </ng-container>
+</div>

@@ -1,0 +1,134 @@
+<div class="detail-container">
+  <ng-container *ngIf="isAddMode || isEditMode || isViewMode">
+    <div class="emp-page-header">
+      <span class="emp-breadcrumb">HR / Attendance / {{ isEditMode ? 'Edit' : (isViewMode ? 'View' : 'New') }}</span>
+      <h1 class="emp-page-title">{{ isEditMode ? 'Edit Attendance' : (isViewMode ? 'View Attendance' : 'Add Attendance') }}</h1>
+      <p class="emp-page-subtitle">{{ isEditMode ? 'Update attendance information' : (isViewMode ? 'Attendance details' : 'Create a new attendance record') }}</p>
+    </div>
+
+    <div *ngIf="submitError" class="emp-alert emp-alert-danger">{{ submitError }}</div>
+    <div *ngIf="successMessage" class="emp-alert emp-alert-success">{{ successMessage }}</div>
+
+    <div *ngIf="isLoading" class="list-loader-container mt-4">
+      <app-loader></app-loader>
+    </div>
+
+    <form *ngIf="!isLoading" id="attendanceForm" [formGroup]="attendanceForm" (ngSubmit)="onSubmit()" class="add-emp-layout" novalidate>
+      <!-- Employee Details (Left Column) -->
+      <div class="add-emp-sidebar">
+        
+        <!-- Employee Selection -->
+        <div class="emp-card p-0">
+          <div class="add-emp-section-header">
+            <div class="add-emp-section-icon icon-blue"><i class="bi bi-person"></i></div>
+            <div>
+              <p class="add-emp-section-title">Employee Details</p>
+              <p class="add-emp-section-subtitle">Select employee and auto-fill details</p>
+            </div>
+          </div>
+          <div class="emp-form-grid">
+            <div class="emp-form-group add-emp-full-width">
+              <label class="emp-form-label">Select Employee <span class="emp-form-required" *ngIf="!isViewMode">*</span></label>
+              
+              <select *ngIf="!isViewMode" class="emp-form-control" formControlName="selectedEmployee" (change)="onEmployeeSelect($event)" [class.is-invalid]="isInvalid('selectedEmployee')">
+                <option value="">Select an employee</option>
+                <option *ngFor="let emp of employees" [value]="emp.id">{{ emp.firstName }} {{ emp.lastName }}</option>
+              </select>
+              <input *ngIf="isViewMode" type="text" class="emp-form-control" [value]="f['employeeName'].value" readonly>
+              
+              <span class="emp-form-error" *ngIf="!isViewMode && isInvalid('selectedEmployee')">Employee is required.</span>
+            </div>
+
+            <div class="emp-form-group add-emp-full-width">
+              <label class="emp-form-label">Employee ID</label>
+              <input type="text" class="emp-form-control" formControlName="employeeId" readonly>
+            </div>
+
+            <div class="emp-form-group add-emp-full-width">
+              <label class="emp-form-label">Department</label>
+              <input type="text" class="emp-form-control" formControlName="department" readonly>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Attendance Details (Right Column) -->
+      <div class="add-emp-main">
+
+        <!-- Attendance Details -->
+        <div class="emp-card p-0">
+          <div class="add-emp-section-header">
+            <div class="add-emp-section-icon icon-green"><i class="bi bi-clock-history"></i></div>
+            <div>
+              <p class="add-emp-section-title">Attendance Details</p>
+              <p class="add-emp-section-subtitle">Date and timings</p>
+            </div>
+          </div>
+          <div class="emp-form-grid">
+            <div class="emp-form-group">
+              <label class="emp-form-label">Date <span class="emp-form-required" *ngIf="!isViewMode">*</span></label>
+              <input type="date" class="emp-form-control" formControlName="date" [readonly]="isViewMode" [class.is-invalid]="isInvalid('date')">
+              <span class="emp-form-error" *ngIf="!isViewMode && isInvalid('date')">Date is required.</span>
+            </div>
+            <div class="emp-form-group">
+              <label class="emp-form-label">Status <span class="emp-form-required" *ngIf="!isViewMode">*</span></label>
+              
+              <select *ngIf="!isViewMode" class="emp-form-control" formControlName="status" [class.is-invalid]="isInvalid('status')">
+                <option *ngFor="let s of statusOptions" [value]="s">{{ s }}</option>
+              </select>
+              <input *ngIf="isViewMode" type="text" class="emp-form-control" [value]="f['status'].value" readonly>
+            </div>
+            <div class="emp-form-group">
+              <label class="emp-form-label">Check In Time</label>
+              <input type="time" class="emp-form-control" formControlName="checkIn" [readonly]="isViewMode">
+            </div>
+            <div class="emp-form-group">
+              <label class="emp-form-label">Check Out Time</label>
+              <input type="time" class="emp-form-control" formControlName="checkOut" [readonly]="isViewMode">
+            </div>
+            <div class="emp-form-group">
+              <label class="emp-form-label">Working Hours</label>
+              <input type="text" class="emp-form-control" formControlName="workingHours" readonly>
+            </div>
+          </div>
+        </div>
+
+        <!-- Additional Notes -->
+        <div class="emp-card p-0">
+          <div class="add-emp-section-header">
+            <div class="add-emp-section-icon icon-orange"><i class="bi bi-journal-text"></i></div>
+            <div>
+              <p class="add-emp-section-title">Remarks</p>
+              <p class="add-emp-section-subtitle">Optional comments or notes</p>
+            </div>
+          </div>
+          <div class="emp-form-grid">
+            <div class="emp-form-group add-emp-full-width">
+              <textarea class="emp-form-control add-emp-textarea" rows="3" formControlName="remarks" [readonly]="isViewMode"></textarea>
+            </div>
+          </div>
+        </div>
+      </div>
+    </form>
+
+    <div class="add-emp-footer-bar" *ngIf="!isLoading && !isViewMode">
+      <span class="add-emp-required-note"><span class="emp-form-required">*</span> Required fields</span>
+      <div class="add-emp-footer-actions">
+        <button type="button" class="emp-btn emp-btn-outline" (click)="cancel()" [disabled]="isSaving">
+          Cancel
+        </button>
+        <button type="submit" form="attendanceForm" class="emp-btn emp-btn-primary" [disabled]="attendanceForm.invalid || isSaving">
+          <span *ngIf="isSaving" class="add-emp-spinner"></span>
+          {{ isSaving ? (isEditMode ? 'Updating...' : 'Saving...') : (isEditMode ? 'Update Attendance' : 'Save Attendance') }}
+        </button>
+      </div>
+    </div>
+    
+    <div class="add-emp-footer-bar" *ngIf="!isLoading && isViewMode">
+      <div></div>
+      <div class="add-emp-footer-actions">
+        <button type="button" class="emp-btn emp-btn-outline" (click)="cancel()">Back to List</button>
+      </div>
+    </div>
+  </ng-container>
+</div>

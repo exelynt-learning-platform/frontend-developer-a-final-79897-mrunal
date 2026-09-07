@@ -1,0 +1,327 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+/* ═══════════════════════════════════════
+   SIDEBAR – Premium Theme
+   ═══════════════════════════════════════ */
+.ems-sidebar {
+  position: fixed;
+  top: 60px;           /* below navbar */
+  left: 0;
+  bottom: 0;
+  width: 280px;        /* Expanded width */
+  background: #FFFFFF;
+  border-right: 1px solid #E5E7EB;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.03);
+  display: flex;
+  flex-direction: column;
+  overflow-y: hidden;
+  overflow-x: visible; /* Required for tooltips */
+  transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 1020;
+  font-family: 'Inter', sans-serif;
+  scrollbar-width: thin;
+  scrollbar-color: #E5E7EB transparent;
+  color: #374151;
+}
+
+.ems-sidebar::-webkit-scrollbar { width: 4px; }
+.ems-sidebar::-webkit-scrollbar-track { background: transparent; }
+.ems-sidebar::-webkit-scrollbar-thumb { background: #E5E7EB; border-radius: 4px; }
+
+/* Collapsed state */
+.ems-sidebar.collapsed {
+  width: 70px;
+}
+
+/* ── Section label ──────────────────── */
+.sidebar-section-label {
+  padding: 1.5rem 1.5rem 0.75rem;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: #9CA3AF;
+  text-transform: uppercase;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+/* ── Nav menu ──────────────────────────── */
+.sidebar-nav {
+  flex: 1;
+  padding: 0;
+}
+
+.sidebar-menu {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.sidebar-menu-group {
+  position: relative; /* For tooltips */
+}
+
+/* ── Custom Tooltips for Collapsed Mode ── */
+.sidebar-menu-group[data-tooltip]::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  left: 100%;
+  top: 50%;
+  transform: translateY(-50%) translateX(10px);
+  background: #111827;
+  color: #fff;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  white-space: nowrap;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  z-index: 1050;
+}
+
+.sidebar-menu-group[data-tooltip]::before {
+  content: '';
+  position: absolute;
+  left: 100%;
+  top: 50%;
+  transform: translateY(-50%) translateX(6px);
+  border-width: 4px;
+  border-style: solid;
+  border-color: transparent #111827 transparent transparent;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 1050;
+}
+
+.sidebar-menu-group:hover[data-tooltip]::after,
+.sidebar-menu-group:hover[data-tooltip]::before {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* ── Group Header (Parent Menu) ────────── */
+.sidebar-group-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 12px 18px;
+  border-radius: 12px;
+  margin: 4px 16px;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  font-weight: 500;
+  color: #4B5563; /* Dark text */
+  user-select: none;
+  text-decoration: none;
+  outline: none;
+}
+
+/* Focus outline for accessibility */
+.sidebar-group-header:focus-visible {
+  box-shadow: 0 0 0 2px #2563EB;
+}
+
+.sidebar-group-header:hover {
+  background: #F3F4F6;
+  color: #111827;
+}
+
+.sidebar-group-header:hover .sidebar-icon,
+.sidebar-group-header:hover .sidebar-chevron {
+  color: #111827;
+}
+
+/* Active Parent (when child route is active) */
+.sidebar-group-header.active-parent {
+  /* Blue background */
+  color: #4B5563;      /* White text */
+  box-shadow: 0 4px 12px rgba(37,99,235,0.25);
+  font-weight: 600;
+}
+
+.sidebar-group-header.active-parent .sidebar-icon,
+.sidebar-group-header.active-parent .sidebar-chevron {
+  color:  #4B5563;      /* White icon */
+}
+
+/* Collapsed Header View */
+.sidebar-group-header.collapsed-view {
+  padding: 12px;
+  justify-content: center;
+  margin: 8px auto;
+  width: 50px;
+  height: 50px;
+}
+
+/* Icon container */
+.sidebar-icon {
+  width: 24px;
+  height: 24px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  color: #6B7280; /* Gray icon */
+  transition: all 0.3s ease;
+}
+
+/* Label */
+.sidebar-label {
+  flex: 1;
+  font-size: 0.95rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Chevron */
+.sidebar-chevron {
+  display: inline-flex;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  color: #9CA3AF;
+}
+
+.sidebar-chevron.open {
+  transform: rotate(180deg);
+}
+
+/* ── Submenu ───────────────────────────── */
+.sidebar-submenu-wrapper {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.sidebar-submenu-wrapper.expanded {
+  max-height: 500px; /* Large enough to hold all items smoothly */
+}
+
+.sidebar-submenu {
+  list-style: none;
+  margin: 0;
+  padding: 0 0 8px 0;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Submenu Link */
+.sidebar-sublink {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  padding: 10px 16px;
+  border-radius: 10px;
+  margin: 2px 16px 2px 42px; /* Indent submenus */
+  color: #6B7280;
+  text-decoration: none;
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  white-space: nowrap;
+  cursor: pointer;
+  outline: none;
+}
+
+.sidebar-sublink:focus-visible {
+  box-shadow: 0 0 0 2px #2563EB;
+}
+
+.sidebar-sublink:hover {
+  background: #F9FAFB;
+  color: #111827;
+}
+
+.sidebar-sublink:hover .sidebar-subicon {
+  color: #111827;
+}
+
+/* Active state for sublink */
+.sidebar-sublink.active {
+  color: #2563EB;
+  font-weight: 600;
+  background: #EFF6FF;
+}
+
+.sidebar-sublink.active .sidebar-subicon {
+  color: #2563EB;
+}
+
+.sidebar-subicon {
+  width: 18px;
+  height: 18px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  color: #9CA3AF;
+  transition: all 0.3s ease;
+}
+
+.sidebar-sublabel {
+  flex: 1;
+}
+
+/* ── Footer / Storage ────────────────────
+.sidebar-footer {
+  padding: 1.25rem 1.5rem;
+  border-top: 1px solid #F3F4F6;
+  flex-shrink: 0;
+  background: #F9FAFB;
+}
+
+.storage-label {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 0.35rem;
+}
+
+.storage-used {
+  font-size: 0.75rem;
+  color: #6B7280;
+  margin-bottom: 0.75rem;
+}
+
+.storage-bar {
+  height: 6px;
+  background: #E5E7EB;
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.storage-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #2563EB, #60A5FA);
+  border-radius: 999px;
+  transition: width 0.4s ease;
+} */
+
+/* ── COLLAPSED STATE ─────────────────────── */
+.ems-sidebar.collapsed .sidebar-submenu-wrapper {
+  display: none; /* Submenus are hidden in collapsed mode */
+}
+
+/* ── MOBILE OVERLAY SIDEBAR ──────────────── */
+@media (max-width: 768px) {
+  .ems-sidebar {
+    transform: translateX(0);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+                width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    width: 280px;
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.15);
+  }
+
+  .ems-sidebar.collapsed {
+    transform: translateX(-100%);
+    width: 280px;
+  }
+}

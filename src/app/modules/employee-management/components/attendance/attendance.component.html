@@ -1,0 +1,150 @@
+<div class="emp-wrapper">
+  <div class="emp-container">
+    <!-- Header -->
+    <div class="emp-page-header">
+      <span class="emp-breadcrumb">HR / Attendance</span>
+      <h1 class="emp-page-title">Attendance</h1>
+      <p class="emp-page-subtitle">Manage employee attendance records</p>
+    </div>
+
+    <!-- Toolbar -->
+    <div class="emp-card">
+      <div class="emp-toolbar" style="flex-wrap: wrap; gap: 12px;">
+        <div class="emp-toolbar-left" style="flex-wrap: wrap; gap: 12px; display: flex; align-items: center;">
+          <div class="emp-search-box">
+            <i class="bi bi-search emp-search-icon"></i>
+            <input type="text" class="emp-search-input" placeholder="Search..." [(ngModel)]="searchTerm" (input)="onSearch($event)">
+          </div>
+
+          <select class="emp-select" [(ngModel)]="statusFilter" (change)="onFilterChange()">
+            <option value="">All Status</option>
+            <option value="Present">Present</option>
+            <option value="Absent">Absent</option>
+            <option value="Half Day">Half Day</option>
+            <option value="Leave">Leave</option>
+          </select>
+
+          <select class="emp-select" [(ngModel)]="departmentFilter" (change)="onFilterChange()">
+            <option value="">All Departments</option>
+            <option *ngFor="let dept of departments" [value]="dept.departmentName">{{ dept.departmentName }}</option>
+          </select>
+
+          <input type="date" class="emp-form-control emp-select" style="max-width: 160px; padding: 6px 12px;" [(ngModel)]="dateFilter" (change)="onFilterChange()">
+
+          <button *ngIf="searchTerm || statusFilter || departmentFilter || dateFilter" class="emp-btn emp-btn-outline" (click)="resetFilters()" style="padding: 6px 12px;">
+            <i class="bi bi-x-circle"></i> Reset
+          </button>
+        </div>
+        
+        <div class="emp-toolbar-right" style="margin-left: auto;">
+          <button class="emp-btn emp-btn-primary add-btn" (click)="addAttendance()">
+            <i class="bi bi-plus-lg"></i> Add
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Table -->
+    <div class="emp-card p-0 position-relative" style="overflow: hidden;">
+      <div *ngIf="isLoading" class="list-loader-container">
+        <app-loader></app-loader>
+      </div>
+      <div *ngIf="error" class="emp-alert emp-alert-danger m-3">{{ error }}</div>
+      <app-no-data *ngIf="!isLoading && total === 0" message="No attendance records found."></app-no-data>
+
+      <div class="emp-table-wrapper" *ngIf="!isLoading && displayedAttendances.length > 0">
+        <table class="emp-table">
+          <thead>
+            <tr>
+              <th style="width: 60px; text-align: center;">Sr No</th>
+              <th>Employee ID</th>
+              <th>Employee Name</th>
+              <th>Department</th>
+              <th>Date</th>
+              <th>Check In</th>
+              <th>Check Out</th>
+              <th>Working Hours</th>
+              <th>Status</th>
+              <th class="text-end" style="padding-right: 24px;">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let att of displayedAttendances; let i = index">
+              <td style="text-align: center;">{{ startItem + i }}</td>
+              <td>{{ att.employeeId }}</td>
+              <td>{{ att.employeeName }}</td>
+              <td>{{ att.department }}</td>
+              <td>{{ att.date | date:'dd-MM-yyyy' }}</td>
+              <td>{{ att.checkIn || '-' }}</td>
+              <td>{{ att.checkOut || '-' }}</td>
+              <td>{{ att.workingHours || '-' }}</td>
+              <td>
+                <span class="emp-badge" [ngClass]="{
+                  'emp-badge-active': att.status.toLowerCase() === 'present',
+                  'emp-badge-leave': att.status.toLowerCase() === 'leave',
+                  'emp-badge-probation': att.status.toLowerCase() === 'half day',
+                  'emp-badge-inactive': att.status.toLowerCase() === 'absent'
+                }">
+                  {{ att.status }}
+                </span>
+              </td>
+              <td style="padding-right: 24px;">
+                <div class="emp-actions">
+                  <button class="emp-icon-btn" (click)="viewAttendance(att.id)" title="View">
+                    <i class="bi bi-eye"></i>
+                  </button>
+                  <button class="emp-icon-btn" (click)="editAttendance(att.id)" title="Edit">
+                    <i class="bi bi-pencil-square"></i>
+                  </button>
+                  <button class="emp-icon-btn emp-icon-btn-danger" (click)="deleteAttendance(att.id)" title="Delete">
+                    <i class="bi bi-trash"></i>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Pagination -->
+    <div class="emp-pagination-container" *ngIf="!isLoading && total > 0">
+      <div class="emp-pagination-info">
+        Showing <strong>{{ startItem }}-{{ endItem }}</strong> of <strong>{{ total }}</strong> records
+      </div>
+      <ul class="emp-pagination">
+        <li>
+          <button class="emp-page-item" [class.disabled]="page === 1" (click)="onPageChange(page - 1)"><i class="bi bi-chevron-left"></i></button>
+        </li>
+        <li *ngFor="let p of pageNumbers">
+          <button class="emp-page-item" [class.active]="p === page" (click)="onPageChange(p)">{{ p }}</button>
+        </li>
+        <li>
+          <button class="emp-page-item" [class.disabled]="page === totalPages" (click)="onPageChange(page + 1)"><i class="bi bi-chevron-right"></i></button>
+        </li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal show" style="display: block; background: rgba(0,0,0,0.5);" *ngIf="showDeleteModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="deleteModalLabel">Delete Attendance</h5>
+        <button type="button" class="btn-close" aria-label="Close" (click)="cancelDelete()" [disabled]="isDeleting"></button>
+      </div>
+      <div class="modal-body">
+        <p>Are you sure you want to delete this attendance record? This action cannot be undone.</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="cancelDelete()" [disabled]="isDeleting">Cancel</button>
+        <button type="button" class="btn btn-danger" (click)="confirmDelete()" [disabled]="isDeleting">
+          <span *ngIf="isDeleting" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+          {{ isDeleting ? 'Deleting...' : 'Delete' }}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

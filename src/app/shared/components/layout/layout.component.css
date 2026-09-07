@@ -1,0 +1,91 @@
+/* ═══════════════════════════════════════
+   LAYOUT – Shell styling
+   ═══════════════════════════════════════ */
+
+.ems-layout-wrapper {
+  height: 100vh;
+  overflow: hidden;
+  background: #f8f9fc;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Body row sits below the fixed navbar */
+.ems-layout-body {
+  display: flex;
+  flex: 1;
+  padding-top: 60px; /* offset for fixed navbar */
+  min-height: 0;
+  overflow: hidden;
+}
+
+/* Main Content Area – scrolls vertically, flex column so content flows naturally */
+.ems-layout-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  scroll-behavior: smooth;
+  margin-left: 280px; /* offset for fixed sidebar */
+  transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.ems-layout-main.sidebar-collapsed {
+  margin-left: 90px;
+}
+
+/* Page content grows to fill remaining space */
+.ems-content-container {
+  flex: 1;
+  padding: 1.5rem 2rem;
+  padding-bottom: calc(44px + 1.5rem); /* clearance for fixed footer */
+}
+
+/* ── GLOBALLY APPLIED CARD STYLING FOR CONTENT ── */
+::ng-deep .ems-content-container .card,
+::ng-deep .ems-content-container .content-card {
+  background: #ffffff;
+  border-radius: 16px;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 4px 14px rgba(15, 23, 42, 0.03);
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+::ng-deep .ems-content-container .page-title {
+  font-family: 'Inter', sans-serif;
+  font-size: 1.75rem;
+  font-weight: 800;
+  color: #111827;
+  margin-bottom: 0.25rem;
+  letter-spacing: -0.02em;
+}
+
+::ng-deep .ems-content-container .page-subtitle {
+  font-size: 0.875rem;
+  color: #6b7280;
+  margin-bottom: 1.5rem;
+}
+
+/* ── RESPONSIVE ─────────────────────────── */
+@media (max-width: 1024px) {
+  .ems-content-container {
+    padding: 1.25rem;
+    padding-bottom: calc(44px + 1.25rem); /* keep footer clearance */
+  }
+}
+
+@media (max-width: 768px) {
+  .ems-layout-main {
+    margin-left: 0 !important; /* Mobile sidebar is an overlay */
+  }
+}
+
+@media (max-width: 520px) {
+  /* Footer goes stacked on very small screens, allow more room */
+  .ems-content-container {
+    padding: 1rem;
+    padding-bottom: calc(80px + 1rem);
+  }
+}
+

@@ -1,0 +1,155 @@
+<div class="emp-wrapper">
+  <div class="emp-container">
+    
+    <!-- Header -->
+    <div class="emp-page-header">
+      <h1 class="emp-page-title">Reports & Analytics</h1>
+      <p class="emp-page-subtitle">Report details for Employees</p>
+    </div>
+
+    <!-- Error State -->
+    <div *ngIf="error" class="emp-alert emp-alert-danger">
+      {{ error }}
+    </div>
+
+    <!-- Loading State -->
+    <div *ngIf="isLoading" class="emp-card" style="text-align: center; padding: 40px;">
+      <p style="color: var(--text-muted, #64748b);">Loading report data...</p>
+    </div>
+
+    <ng-container *ngIf="!isLoading && !error">
+      
+      <!-- Summary Cards -->
+      <div class="emp-form-grid" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); padding: 0 0 24px 0;">
+        
+        <div class="emp-card stat-card">
+          <div class="stat-label">Total Employees</div>
+          <div class="stat-value">{{ totalEmployees }}</div>
+        </div>
+        
+        <div class="emp-card stat-card">
+          <div class="stat-label">Active Employees</div>
+          <div class="stat-value">{{ activeEmployees }}</div>
+        </div>
+        
+        <div class="emp-card stat-card">
+          <div class="stat-label">Total Departments</div>
+          <div class="stat-value">{{ totalDepartments }}</div>
+        </div>
+        
+        <div class="emp-card stat-card">
+          <div class="stat-label">Monthly Payroll</div>
+          <div class="stat-value">${{ monthlyPayroll | number:'1.0-0' }}</div>
+        </div>
+
+        <div class="emp-card stat-card">
+          <div class="stat-label">New Joinees</div>
+          <div class="stat-value">{{ newJoinees }}</div>
+        </div>
+
+        <div class="emp-card stat-card">
+          <div class="stat-label">Total Leaves</div>
+          <div class="stat-value">{{ totalLeaves }}</div>
+        </div>
+
+      </div>
+
+      <!-- Filters & Actions Toolbar -->
+      <div class="emp-card">
+        <form [formGroup]="reportForm" class="emp-toolbar">
+          
+          <div class="emp-toolbar-left">
+            <select class="emp-select" formControlName="departmentId">
+              <option value="all">All Departments</option>
+              <option *ngFor="let dept of departments" [value]="dept.id">{{ dept.departmentName }}</option>
+            </select>
+
+            <select class="emp-select" formControlName="status">
+              <option value="all">All Statuses</option>
+              <option value="Active">Active</option>
+              <option value="Inactive">Inactive</option>
+              <option value="Probation">Probation</option>
+              <option value="On Leave">On Leave</option>
+            </select>
+          </div>
+
+          <div class="emp-toolbar-right">
+            <button type="button" class="emp-btn emp-btn-outline" (click)="refreshData()">
+              <i class="fas fa-sync-alt"></i> Refresh
+            </button>
+            <button type="button" class="emp-btn emp-btn-outline" (click)="exportToCSV()">
+              <i class="fas fa-file-excel"></i> Export CSV
+            </button>
+            <button type="button" class="emp-btn emp-btn-primary" (click)="printReport()">
+              <i class="fas fa-print"></i> Print
+            </button>
+          </div>
+
+        </form>
+      </div>
+
+      <!-- Reports Table -->
+      <div class="emp-card">
+        <h3 style="margin: 0 0 16px 0; font-size: 16px; color: var(--text-dark, #0f172a);">Employee Details</h3>
+        
+        <div class="emp-table-wrapper">
+          <table class="emp-table">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Employee</th>
+                <th>Department</th>
+                <th>Position</th>
+                <th>Status</th>
+                <th>Salary</th>
+                <th>Joining Date</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let emp of filteredEmployees">
+                <td>#{{ emp.id }}</td>
+                <td class="emp-col-employee">
+                  <div class="emp-employee-cell">
+                    <div class="emp-user-info">
+                      <span class="emp-user-name">{{ emp.firstName }} {{ emp.lastName }}</span>
+                      <span class="emp-user-email">{{ emp.email }}</span>
+                    </div>
+                  </div>
+                </td>
+                <td>{{ getDepartmentName(emp.departmentId) }}</td>
+                <td>{{ emp.position }}</td>
+                <td>
+                  <span class="emp-badge" 
+                    [ngClass]="{
+                      'emp-badge-active': emp.status === 'Active',
+                      'emp-badge-inactive': emp.status === 'Inactive',
+                      'emp-badge-probation': emp.status === 'Probation',
+                      'emp-badge-leave': emp.status === 'On Leave'
+                    }">
+                    {{ emp.status }}
+                  </span>
+                </td>
+                <td>${{ emp.salary | number:'1.0-0' }}</td>
+                <td>{{ emp.hireDate | date:'mediumDate' }}</td>
+              </tr>
+              <tr *ngIf="filteredEmployees.length === 0">
+                <td colspan="7" style="text-align: center; padding: 32px; color: var(--text-muted, #64748b);">
+                  No data available for the selected filters.
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="emp-pagination-container" *ngIf="filteredEmployees.length > 0">
+          <div class="emp-pagination-info">
+            Showing {{ filteredEmployees.length }} entries
+          </div>
+        </div>
+
+      </div>
+
+    </ng-container>
+
+  </div>
+</div>

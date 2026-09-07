@@ -1,0 +1,33 @@
+/* Custom styles minimal, inheriting from styles.css */
+.stat-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 8px;
+  min-height: 100px;
+}
+.stat-label {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-muted, #64748b);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.stat-value {
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--text-dark, #0f172a);
+}
+
+@media print {
+  .ems-sidebar, .ems-navbar, .emp-toolbar, .emp-pagination-container {
+    display: none !important;
+  }
+  .emp-wrapper {
+    background-color: white !important;
+  }
+  .emp-card {
+    box-shadow: none !important;
+    border: 1px solid #ccc !important;
+  }
+}

@@ -1,0 +1,35 @@
+<div class="emp-wrapper">
+  <div class="emp-container">
+    <div class="emp-page-header">
+      <h1 class="emp-page-title">Settings</h1>
+      <p class="emp-page-subtitle">Manage your application preferences</p>
+    </div>
+
+    <div class="emp-card" style="max-width: 600px;">
+      <div class="add-emp-section-header" style="margin-bottom: 24px;">
+        <div class="add-emp-section-icon icon-purple"><i class="bi bi-palette"></i></div>
+        <div>
+          <p class="add-emp-section-title">Appearance</p>
+          <p class="add-emp-section-subtitle">Customize how the application looks.</p>
+        </div>
+      </div>
+
+      <div style="display: flex; justify-content: space-between; align-items: center; padding: 16px; border: 1px solid var(--border-color, #e2e8f0); border-radius: 8px;">
+        <div>
+          <label style="font-weight: 600; color: var(--text-dark, #0f172a); display: block; margin-bottom: 4px;">Dark Mode</label>
+          <span style="font-size: 12px; color: var(--text-muted, #64748b);">Enable dark theme across the entire application</span>
+        </div>
+
+        <label class="switch" style="position: relative; display: inline-block; width: 50px; height: 26px;">
+          <input
+            type="checkbox"
+            [checked]="isDarkMode"
+            (change)="toggleTheme()"
+          >
+          <span class="slider"></span>
+        </label>
+      </div>
+      
+    </div>
+  </div>
+</div>

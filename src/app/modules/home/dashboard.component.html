@@ -1,0 +1,211 @@
+<div class="emp-wrapper">
+  <div class="emp-container">
+
+    <!-- Loading State -->
+    <div *ngIf="isLoading" class="emp-card" style="text-align: center; padding: 40px;">
+      <p style="color: var(--text-muted, #64748b);">Loading dashboard data...</p>
+    </div>
+
+    <!-- Error State -->
+    <div *ngIf="error" class="emp-alert emp-alert-danger">
+      {{ error }}
+    </div>
+
+    <ng-container *ngIf="!isLoading && !error">
+      
+      <!-- 1. Header Section -->
+      <div class="dash-header">
+        <h1 class="dash-title">Good morning, {{ loggedInUserName }} 👋</h1>
+        <p class="dash-subtitle">Here's what's happening across the organization today.</p>
+      </div>
+
+      <!-- 2. Statistics Cards -->
+      <div class="dash-stats-grid">
+        
+        <!-- Total Employees -->
+        <div class="emp-card stat-card">
+          <div class="stat-header">
+            <div class="stat-icon dashboard-icon">
+              <i class="bi bi-people"></i>
+            </div>
+          </div>
+          <div class="stat-value">{{ totalEmployees }}</div>
+          <div class="stat-label">Total Employees</div>
+        </div>
+
+        <!-- Active Employees -->
+        <div class="emp-card stat-card">
+          <div class="stat-header">
+            <div class="stat-icon dashboard-icon">
+              <i class="bi bi-check2"></i>
+            </div>
+            <div class="stat-badge dashboard-badge">{{ activePercentage }}% present</div>
+          </div>
+          <div class="stat-value">{{ activeEmployees }}</div>
+          <div class="stat-label">Active Employees</div>
+        </div>
+
+        <!-- Departments -->
+        <div class="emp-card stat-card">
+          <div class="stat-header">
+            <div class="stat-icon dashboard-icon">
+              <i class="bi bi-diagram-3"></i>
+            </div>
+            <div class="stat-badge dashboard-badge">Stable</div>
+          </div>
+          <div class="stat-value">{{ totalDepartments }}</div>
+          <div class="stat-label">Departments</div>
+        </div>
+
+        <!-- New Joiners -->
+        <div class="emp-card stat-card">
+          <div class="stat-header">
+            <div class="stat-icon dashboard-icon">
+              <i class="bi bi-person-plus"></i>
+            </div>
+            <div class="stat-badge dashboard-badge">This month</div>
+          </div>
+          <div class="stat-value">{{ newEmployees }}</div>
+          <div class="stat-label">New Joiners</div>
+        </div>
+
+      </div>
+
+      <!-- 3 & 4. Charts Section -->
+      <div class="dash-charts-grid">
+        
+        <!-- Employee Growth (Line Chart) -->
+        <div class="emp-card chart-card">
+          <div class="chart-header">
+            <div>
+              <h3 class="chart-title">Employee Growth</h3>
+              <p class="chart-subtitle">Headcount over the last 12 months</p>
+            </div>
+            <div class="chart-actions">
+              <button class="emp-btn emp-btn-outline btn-sm">Year</button>
+              <button class="emp-btn emp-btn-primary btn-sm">Headcount</button>
+            </div>
+          </div>
+          <div class="chart-container">
+            <canvas baseChart 
+              [data]="growthChartData" 
+              [options]="growthChartOptions" 
+              [type]="growthChartType">
+            </canvas>
+          </div>
+        </div>
+
+        <!-- Department Distribution (Donut Chart) -->
+        <div class="emp-card chart-card">
+          <div class="chart-header">
+            <div>
+              <h3 class="chart-title">Department Distribution</h3>
+              <p class="chart-subtitle">Employees per department</p>
+            </div>
+          </div>
+          
+          <div class="donut-container">
+            <!-- Center Text for Donut -->
+            <div class="donut-center-text">
+              <span class="donut-total">{{ totalEmployees }}</span>
+              <span class="donut-label">people</span>
+            </div>
+            <canvas baseChart 
+              [data]="deptChartData" 
+              [options]="deptChartOptions" 
+              [type]="deptChartType">
+            </canvas>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- 5 & 6. Tables Section -->
+      <div class="dash-tables-grid">
+        
+        <!-- Recent Employees Table -->
+        <div class="emp-card table-card">
+          <div class="table-header-row">
+            <h3 class="chart-title">Recent Employees</h3>
+            <a routerLink="/employee-management/employees" class="view-all-link">View all</a>
+          </div>
+          
+          <div class="emp-table-wrapper" style="box-shadow: none; border-radius: 0;">
+            <table class="emp-table">
+              <thead>
+                <tr>
+                  <th>EMPLOYEE</th>
+                  <th>DEPARTMENT</th>
+                  <th>STATUS</th>
+                  <th>JOINED</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let emp of recentEmployees">
+                  <td class="emp-col-employee">
+                    <div class="emp-employee-cell">
+                      <div class="emp-avatar bg-primary text-white" style="width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; font-weight: 600;">
+                        {{ getInitials(emp.firstName, emp.lastName) }}
+                      </div>
+                      <div class="emp-user-info">
+                        <span class="emp-user-name">{{ emp.firstName }} {{ emp.lastName }}</span>
+                        <span class="emp-user-email">{{ emp.position }}</span>
+                      </div>
+                    </div>
+                  </td>
+                  <td>{{ getDepartmentName(emp.departmentId) }}</td>
+                  <td>
+                    <span class="emp-badge" 
+                      [ngClass]="{
+                        'emp-badge-active': emp.status === 'Active',
+                        'emp-badge-inactive': emp.status !== 'Active'
+                      }">
+                      <span class="status-dot"></span> {{ emp.status }}
+                    </span>
+                  </td>
+                  <td>{{ emp.hireDate | date:'dd MMM yyyy' }}</td>
+                </tr>
+                <tr *ngIf="recentEmployees.length === 0">
+                  <td colspan="4" style="text-align: center; color: var(--text-muted);">No recent employees found.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Upcoming Birthdays Widget -->
+        <div class="emp-card table-card" *ngIf="upcomingBirthdays.length > 0; else noBirthdays">
+          <div class="table-header-row" style="margin-bottom: 20px;">
+            <h3 class="chart-title"><i class="bi bi-gift" style="color: #f59e0b; margin-right: 8px;"></i> Upcoming Birthdays</h3>
+          </div>
+          
+          <div class="birthday-list">
+            <div class="birthday-item" *ngFor="let emp of upcomingBirthdays">
+              <div class="emp-employee-cell">
+                <div class="emp-avatar dashboard-icon" style="width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; font-weight: 600;">
+                  {{ getInitials(emp.firstName, emp.lastName) }}
+                </div>
+                <div class="emp-user-info">
+                  <span class="emp-user-name">{{ emp.firstName }} {{ emp.lastName }}</span>
+                  <span class="emp-user-email">{{ emp.position }}</span>
+                </div>
+              </div>
+              
+              <!-- Safely handle date string, use type assertion to any for the dynamic property check -->
+              <div class="bday-badge">{{ getBirthdayStatus($any(emp).dateOfBirth || $any(emp).dob) }}</div>
+            </div>
+          </div>
+        </div>
+
+        <ng-template #noBirthdays>
+          <div class="emp-card table-card" style="display: flex; align-items: center; justify-content: center; flex-direction: column; min-height: 250px;">
+            <i class="bi bi-gift" style="font-size: 32px; color: var(--border-color); margin-bottom: 16px;"></i>
+            <p style="color: var(--text-muted); text-align: center;">Birthday data unavailable.</p>
+          </div>
+        </ng-template>
+
+      </div>
+
+    </ng-container>
+  </div>
+</div>

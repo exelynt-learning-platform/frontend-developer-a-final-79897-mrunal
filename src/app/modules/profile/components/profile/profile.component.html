@@ -1,0 +1,162 @@
+<div class="detail-container">
+  <!-- Header -->
+  <div class="emp-page-header">
+    <span class="emp-breadcrumb">HR / My Profile</span>
+    <h1 class="emp-page-title">My Profile</h1>
+    <p class="emp-page-subtitle">View your employee information</p>
+  </div>
+
+  <div *ngIf="isLoading" class="list-loader-container mt-4">
+    <app-loader></app-loader>
+  </div>
+
+  <div *ngIf="loadError" class="emp-alert emp-alert-danger mt-4">
+    No Profile Data Available. <button class="btn btn-link" (click)="retry()">Retry</button>
+  </div>
+
+  <div *ngIf="!isLoading && !loadError && profile" class="add-emp-layout">
+    
+    <!-- LEFT SIDEBAR -->
+    <div class="add-emp-sidebar">
+      <!-- Avatar & Basic Info -->
+      <div class="emp-card p-0 text-center" style="padding: 24px!important;">
+        <div class="avatar-lg mx-auto mb-3" style="width: 80px; height: 80px; border-radius: 50%; background: var(--primary-color); color: white; display: flex; align-items: center; justify-content: center; font-size: 2rem; font-weight: 600;">
+          {{ profile.profileImage ? '' : initials }}
+          <img *ngIf="profile.profileImage" [src]="profile.profileImage" alt="Profile" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">
+        </div>
+        <h3 style="margin-bottom: 4px; font-weight: 600; color: var(--text-dark);">{{ profile.firstName }} {{ profile.lastName }}</h3>
+        <p style="margin-bottom: 12px; color: var(--text-muted); font-size: 0.9rem;">{{ profile.position }}</p>
+        
+        <div style="display: flex; gap: 8px; justify-content: center; margin-bottom: 16px;">
+          <span class="emp-badge emp-badge-active">{{ profile.status }}</span>
+          <span class="emp-badge" style="background: #eef2ff; color: #4f46e5;">Dept: {{ profile.departmentId }}</span>
+        </div>
+        
+        <div style="text-align: left; border-top: 1px solid var(--border-color); padding-top: 16px;">
+          <div style="margin-bottom: 12px;">
+            <div style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-light); margin-bottom: 4px;">Employee ID</div>
+            <div style="font-weight: 500; color: var(--text-dark);">{{ profile.id }}</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Contact Info -->
+      <div class="emp-card p-0">
+        <div class="add-emp-section-header">
+          <div class="add-emp-section-icon icon-blue"><i class="bi bi-person-lines-fill"></i></div>
+          <div>
+            <p class="add-emp-section-title">Contact</p>
+          </div>
+        </div>
+        <div class="emp-form-grid" style="padding-top: 0; padding-bottom: 24px;">
+          <div class="emp-form-group add-emp-full-width" style="margin-bottom: 12px;">
+            <label class="emp-form-label">Email</label>
+            <div style="font-weight: 500; color: var(--text-dark); display: flex; align-items: center; gap: 8px;">
+              <i class="bi bi-envelope text-muted"></i> {{ profile.email || '-' }}
+            </div>
+          </div>
+          <div class="emp-form-group add-emp-full-width" style="margin-bottom: 12px;">
+            <label class="emp-form-label">Mobile</label>
+            <div style="font-weight: 500; color: var(--text-dark); display: flex; align-items: center; gap: 8px;">
+              <i class="bi bi-telephone text-muted"></i> {{ profile.phoneNumber || '-' }}
+            </div>
+          </div>
+          <div class="emp-form-group add-emp-full-width" style="margin-bottom: 0;">
+            <label class="emp-form-label">Address</label>
+            <div style="font-weight: 500; color: var(--text-dark); display: flex; align-items: center; gap: 8px;">
+              <i class="bi bi-geo-alt text-muted"></i> {{ profile.address ? profile.address + ', ' + (profile.city || '') + ' ' + (profile.state || '') : '-' }}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT MAIN CONTENT -->
+    <div class="add-emp-main">
+      <div class="emp-card p-0" style="overflow: hidden;">
+        <!-- Tabs -->
+        <div style="display: flex; border-bottom: 1px solid var(--border-color); background: #fafafa; overflow-x: auto;">
+          <button *ngFor="let tab of tabs" 
+                  (click)="selectTab(tab.id)"
+                  [style.border-bottom]="activeTab === tab.id ? '2px solid var(--primary-color)' : '2px solid transparent'"
+                  [style.color]="activeTab === tab.id ? 'var(--primary-color)' : 'var(--text-muted)'"
+                  style="padding: 16px 24px; font-weight: 500; background: none; border: none; cursor: pointer; transition: all 0.2s;">
+            {{ tab.label }}
+          </button>
+        </div>
+
+        <!-- Tab Content -->
+        <div style="padding: 24px;">
+          
+          <!-- OVERVIEW -->
+          <div *ngIf="activeTab === 'overview'">
+            <h4 style="margin-bottom: 20px; font-weight: 600; color: var(--text-dark);">Employment Details</h4>
+            
+            <div class="emp-form-grid">
+              <div class="emp-form-group">
+                <label class="emp-form-label">First Name</label>
+                <input type="text" class="emp-form-control" [value]="profile.firstName" readonly>
+              </div>
+              <div class="emp-form-group">
+                <label class="emp-form-label">Last Name</label>
+                <input type="text" class="emp-form-control" [value]="profile.lastName" readonly>
+              </div>
+              <div class="emp-form-group">
+                <label class="emp-form-label">Employee ID</label>
+                <input type="text" class="emp-form-control" [value]="profile.id" readonly>
+              </div>
+              <div class="emp-form-group">
+                <label class="emp-form-label">Email Address</label>
+                <input type="text" class="emp-form-control" [value]="profile.email" readonly>
+              </div>
+              <div class="emp-form-group">
+                <label class="emp-form-label">Mobile Number</label>
+                <input type="text" class="emp-form-control" [value]="profile.phoneNumber" readonly>
+              </div>
+              <div class="emp-form-group">
+                <label class="emp-form-label">Department ID</label>
+                <input type="text" class="emp-form-control" [value]="profile.departmentId" readonly>
+              </div>
+              <div class="emp-form-group">
+                <label class="emp-form-label">Designation</label>
+                <input type="text" class="emp-form-control" [value]="profile.position" readonly>
+              </div>
+              <div class="emp-form-group">
+                <label class="emp-form-label">Salary</label>
+                <input type="text" class="emp-form-control" [value]="formatCurrency(profile.salary || 0)" readonly>
+              </div>
+              <div class="emp-form-group">
+                <label class="emp-form-label">Joining Date</label>
+                <input type="text" class="emp-form-control" [value]="(profile.hireDate | date:'dd-MM-yyyy') || '-'" readonly>
+              </div>
+              <div class="emp-form-group">
+                <label class="emp-form-label">Status</label>
+                <input type="text" class="emp-form-control" [value]="profile.status" readonly>
+              </div>
+              <div class="emp-form-group">
+                <label class="emp-form-label">Employment Type</label>
+                <input type="text" class="emp-form-control" [value]="profile.employmentType || '-'" readonly>
+              </div>
+              <div class="emp-form-group">
+                <label class="emp-form-label">Date of Birth</label>
+                <input type="text" class="emp-form-control" [value]="(profile.dateOfBirth | date:'dd-MM-yyyy') || '-'" readonly>
+              </div>
+              <div class="emp-form-group add-emp-full-width">
+                <label class="emp-form-label">Full Address</label>
+                <input type="text" class="emp-form-control" [value]="profile.address ? profile.address + ', ' + (profile.city || '') + ' ' + (profile.state || '') + ' - ' + (profile.pincode || '') : '-'" readonly>
+              </div>
+            </div>
+          </div>
+
+          <!-- OTHER TABS -->
+          <div *ngIf="activeTab !== 'overview'" style="text-align: center; padding: 40px 0; color: var(--text-muted);">
+            <i class="bi bi-folder2-open" style="font-size: 3rem; color: var(--border-color); margin-bottom: 16px; display: block;"></i>
+            <p style="font-size: 1.1rem;">No data available for {{ activeTab | titlecase }} yet.</p>
+            <p style="font-size: 0.9rem;">This section will be populated as you accrue records.</p>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
