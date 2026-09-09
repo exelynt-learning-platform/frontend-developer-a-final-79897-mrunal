@@ -61,7 +61,7 @@ export class EmployeeAddEditPageComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    this.store.dispatch(loadCountries());
+    this.store.dispatch(loadCountries({}));
 
     this.employeeId = this.route.snapshot.paramMap.get('id');
     this.isEdit = !!this.employeeId;

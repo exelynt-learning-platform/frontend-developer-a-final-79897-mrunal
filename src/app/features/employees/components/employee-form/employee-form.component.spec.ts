@@ -124,4 +124,84 @@ describe('EmployeeFormComponent', () => {
     expect(component.employeeForm.value.email).toBe('suresh@cricket.in');
     expect(component.employeeForm.value.mobile).toBe('9876543219');
   });
+
+  it('should reset form when employee input changes to null', () => {
+    spyOn(component.employeeForm, 'reset');
+    component.employee = null;
+    component.ngOnChanges({
+      employee: {
+        currentValue: null,
+        previousValue: { id: '1' } as any,
+        firstChange: false,
+        isFirstChange: () => false
+      }
+    });
+    expect(component.employeeForm.reset).toHaveBeenCalled();
+  });
+
+  it('should correctly determine isFieldInvalid', () => {
+    const nameControl = component.employeeForm.get('name');
+    expect(component.isFieldInvalid('name')).toBeFalse();
+
+    nameControl?.markAsTouched();
+    expect(component.isFieldInvalid('name')).toBeTrue();
+
+    nameControl?.setValue('Valid Name');
+    expect(component.isFieldInvalid('name')).toBeFalse();
+
+    expect(component.isFieldInvalid('nonExistentField')).toBeFalse();
+  });
+
+  it('should return empty string from getFieldError when field has no error or does not exist', () => {
+    expect(component.getFieldError('nonExistentField')).toBe('');
+    component.employeeForm.get('name')?.setValue('Valid Name');
+    expect(component.getFieldError('name')).toBe('');
+  });
+
+  it('should return proper field-specific required error messages', () => {
+    const fields = [
+      { name: 'name', expected: 'Name is required.' },
+      { name: 'email', expected: 'Email is required.' },
+      { name: 'mobile', expected: 'Mobile number is required.' },
+      { name: 'country', expected: 'Country is required.' },
+      { name: 'state', expected: 'State is required.' },
+      { name: 'district', expected: 'District is required.' }
+    ];
+
+    for (const field of fields) {
+      component.employeeForm.get(field.name)?.setValue('');
+      component.employeeForm.get(field.name)?.markAsTouched();
+      expect(component.getFieldError(field.name)).toBe(field.expected);
+    }
+  });
+
+  it('should return error message for whitespaceOnly, minlength, maxlength, and invalid formats', () => {
+    const nameControl = component.employeeForm.get('name');
+    nameControl?.setValue('   ');
+    expect(component.getFieldError('name')).toBe('Field cannot contain only whitespace.');
+
+    nameControl?.setValue('A');
+    expect(component.getFieldError('name')).toBe('Minimum 2 characters required.');
+
+    nameControl?.setValue('A'.repeat(51));
+    expect(component.getFieldError('name')).toBe('Maximum 50 characters allowed.');
+
+    const emailControl = component.employeeForm.get('email');
+    emailControl?.setValue('bad-email');
+    expect(component.getFieldError('email')).toBe('Please enter a valid email address.');
+
+    const mobileControl = component.employeeForm.get('mobile');
+    mobileControl?.setValue('123');
+    expect(component.getFieldError('mobile')).toBe('Please enter a valid mobile number (7-15 digits).');
+
+    // Test fallback error message
+    nameControl?.setErrors({ customError: true });
+    expect(component.getFieldError('name')).toBe('Invalid input.');
+  });
+
+  it('should emit formCancel when onCancel is called', () => {
+    spyOn(component.formCancel, 'emit');
+    component.onCancel();
+    expect(component.formCancel.emit).toHaveBeenCalled();
+  });
 });

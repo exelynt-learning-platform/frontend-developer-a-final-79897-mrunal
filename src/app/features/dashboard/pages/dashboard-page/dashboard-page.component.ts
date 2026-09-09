@@ -57,6 +57,6 @@ export class DashboardPageComponent implements OnInit {
 
   ngOnInit(): void {
     this.store.dispatch(loadEmployees());
-    this.store.dispatch(loadCountries());
+    this.store.dispatch(loadCountries({}));
   }
 }

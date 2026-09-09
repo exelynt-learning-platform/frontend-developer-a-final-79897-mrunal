@@ -7,8 +7,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { Store } from '@ngrx/store';
-import { Observable, combineLatest } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { Observable, BehaviorSubject } from 'rxjs';
 
 import { Employee } from '../../../../core/models/employee.model';
 import { EmployeeTableComponent } from '../../components/employee-table/employee-table.component';
@@ -75,10 +74,9 @@ export class EmployeePageComponent implements OnInit {
   totalCountries$ = this.store.select(selectCountryTotal);
   currentSearchTerm: string | null = null;
 
-  // View state model for search results vs regular listing
-  isSearching$ = combineLatest([this.searchedEmployee$, this.searchError$]).pipe(
-    map(([searched, searchErr]) => searched !== null || searchErr !== null)
-  );
+  // Single source of truth for search active state
+  private searchActiveSubject = new BehaviorSubject<boolean>(false);
+  readonly isSearching$: Observable<boolean> = this.searchActiveSubject.asObservable();
 
   constructor(
     private store: Store,
@@ -88,11 +86,12 @@ export class EmployeePageComponent implements OnInit {
 
   ngOnInit(): void {
     this.store.dispatch(loadEmployees());
-    this.store.dispatch(loadCountries());
+    this.store.dispatch(loadCountries({}));
   }
 
   onRefresh(): void {
     this.currentSearchTerm = null;
+    this.searchActiveSubject.next(false);
     this.store.dispatch(clearEmployeeSearch());
     this.store.dispatch(loadEmployees());
     this.store.dispatch(loadCountries({ force: true }));
@@ -100,11 +99,13 @@ export class EmployeePageComponent implements OnInit {
 
   onSearch(id: string): void {
     this.currentSearchTerm = id;
+    this.searchActiveSubject.next(true);
     this.store.dispatch(loadEmployeeById({ id }));
   }
 
   onClearSearch(): void {
     this.currentSearchTerm = null;
+    this.searchActiveSubject.next(false);
     this.store.dispatch(clearEmployeeSearch());
   }
 

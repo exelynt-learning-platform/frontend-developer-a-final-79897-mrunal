@@ -94,4 +94,16 @@ describe('httpErrorInterceptor', () => {
 
     httpMock.expectOne('/test').flush('Server Error', { status: 500, statusText: 'Server Error' });
   });
+
+  it('should map unhandled status codes to fallback message', (done) => {
+    http.get('/test').subscribe({
+      next: () => fail('Should have failed'),
+      error: (err) => {
+        expect(err.message).toContain('An unexpected error occurred');
+        done();
+      }
+    });
+
+    httpMock.expectOne('/test').flush('Teapot', { status: 418, statusText: "I'm a teapot" });
+  });
 });

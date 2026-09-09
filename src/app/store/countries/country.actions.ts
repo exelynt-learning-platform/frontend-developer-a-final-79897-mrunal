@@ -3,7 +3,7 @@ import { Country } from '../../core/models/country.model';
 
 export const loadCountries = createAction(
   '[Country] Load Countries',
-  (props?: { force?: boolean }) => ({ force: props?.force ?? false })
+  props<{ force?: boolean }>()
 );
 
 export const loadCountriesSuccess = createAction(

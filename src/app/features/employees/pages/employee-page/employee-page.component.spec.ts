@@ -49,15 +49,33 @@ describe('EmployeePageComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should dispatch search action when onSearch is invoked', () => {
+  it('should dispatch search action and update isSearching$ when onSearch is invoked', (done) => {
     component.onSearch('10');
     expect(component.currentSearchTerm).toBe('10');
+    component.isSearching$.subscribe((isSearching) => {
+      expect(isSearching).toBeTrue();
+      done();
+    });
   });
 
-  it('should clear search when onClearSearch is invoked', () => {
-    component.currentSearchTerm = '10';
+  it('should clear search and update isSearching$ when onClearSearch is invoked', (done) => {
+    component.onSearch('10');
     component.onClearSearch();
     expect(component.currentSearchTerm).toBeNull();
+    component.isSearching$.subscribe((isSearching) => {
+      expect(isSearching).toBeFalse();
+      done();
+    });
+  });
+
+  it('should reset search and reload data on onRefresh', (done) => {
+    component.currentSearchTerm = '10';
+    component.onRefresh();
+    expect(component.currentSearchTerm).toBeNull();
+    component.isSearching$.subscribe((isSearching) => {
+      expect(isSearching).toBeFalse();
+      done();
+    });
   });
 
   it('should open form dialog on onAddEmployee', () => {

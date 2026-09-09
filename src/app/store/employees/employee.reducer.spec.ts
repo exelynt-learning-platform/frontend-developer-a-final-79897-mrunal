@@ -146,4 +146,62 @@ describe('Employee Reducer', () => {
     expect(state.entities['1']).toBeUndefined();
     expect(state.entities['2']).toBeDefined();
   });
+
+  it('should set selectedEmployeeId on selectEmployee', () => {
+    const action = EmployeeActions.selectEmployee({ id: '5' });
+    const state = employeeReducer(initialEmployeeState, action);
+    expect(state.selectedEmployeeId).toBe('5');
+  });
+
+  it('should handle createEmployeeFailure', () => {
+    const action = EmployeeActions.createEmployeeFailure({ error: 'Create failed' });
+    const state = employeeReducer(initialEmployeeState, action);
+    expect(state.actionInProgress).toBeFalse();
+    expect(state.actionError).toBe('Create failed');
+  });
+
+  it('should handle updateEmployee and updateEmployeeFailure', () => {
+    const startAction = EmployeeActions.updateEmployee({ id: '1', changes: {} });
+    const startState = employeeReducer(initialEmployeeState, startAction);
+    expect(startState.actionInProgress).toBeTrue();
+    expect(startState.actionError).toBeNull();
+
+    const failAction = EmployeeActions.updateEmployeeFailure({ error: 'Update failed' });
+    const failState = employeeReducer(startState, failAction);
+    expect(failState.actionInProgress).toBeFalse();
+    expect(failState.actionError).toBe('Update failed');
+  });
+
+  it('should update searchedEmployee if its id matches updated employee', () => {
+    const preState: EmployeeState = {
+      ...initialEmployeeState,
+      searchedEmployee: sampleEmployee
+    };
+    const updated = { ...sampleEmployee, name: 'Updated In Search' };
+    const action = EmployeeActions.updateEmployeeSuccess({ employee: updated });
+    const state = employeeReducer(preState, action);
+    expect(state.searchedEmployee?.name).toBe('Updated In Search');
+  });
+
+  it('should handle deleteEmployee and deleteEmployeeFailure', () => {
+    const startAction = EmployeeActions.deleteEmployee({ id: '1' });
+    const startState = employeeReducer(initialEmployeeState, startAction);
+    expect(startState.actionInProgress).toBeTrue();
+    expect(startState.actionError).toBeNull();
+
+    const failAction = EmployeeActions.deleteEmployeeFailure({ error: 'Delete failed' });
+    const failState = employeeReducer(startState, failAction);
+    expect(failState.actionInProgress).toBeFalse();
+    expect(failState.actionError).toBe('Delete failed');
+  });
+
+  it('should reset searchedEmployee if deleted employee matches searchedEmployee', () => {
+    const preState: EmployeeState = {
+      ...initialEmployeeState,
+      searchedEmployee: sampleEmployee
+    };
+    const action = EmployeeActions.deleteEmployeeSuccess({ id: sampleEmployee.id });
+    const state = employeeReducer(preState, action);
+    expect(state.searchedEmployee).toBeNull();
+  });
 });

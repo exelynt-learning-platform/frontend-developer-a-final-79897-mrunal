@@ -71,4 +71,16 @@ describe('EmployeeFormDialogComponent', () => {
     component.onCancel();
     expect(dialogRefSpy.close).toHaveBeenCalledWith(false);
   });
+
+  it('should dispatch createEmployee action on submit in add mode', () => {
+    (component as any).data = {};
+    component.onSubmit(validFormData);
+    expect(store.dispatch).toHaveBeenCalledWith(
+      EmployeeActions.createEmployee({ employee: validFormData })
+    );
+  });
+
+  it('should clean up subscriptions on ngOnDestroy', () => {
+    expect(() => component.ngOnDestroy()).not.toThrow();
+  });
 });

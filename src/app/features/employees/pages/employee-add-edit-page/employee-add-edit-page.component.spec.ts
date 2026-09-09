@@ -1,7 +1,9 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { ActivatedRoute, Router, provideRouter } from '@angular/router';
-import { provideStore, Store } from '@ngrx/store';
+import { provideStore, Store, Action } from '@ngrx/store';
+import { Actions } from '@ngrx/effects';
+import { Subject } from 'rxjs';
 import { EmployeeAddEditPageComponent } from './employee-add-edit-page.component';
 import { employeeReducer } from '../../../../store/employees/employee.reducer';
 import { countryReducer } from '../../../../store/countries/country.reducer';
@@ -13,6 +15,7 @@ describe('EmployeeAddEditPageComponent', () => {
   let fixture: ComponentFixture<EmployeeAddEditPageComponent>;
   let router: Router;
   let store: Store;
+  let actions$: Subject<Action>;
 
   const validFormData: EmployeeFormData = {
     name: 'Rohit Sharma',
@@ -24,6 +27,8 @@ describe('EmployeeAddEditPageComponent', () => {
   };
 
   beforeEach(async () => {
+    actions$ = new Subject<Action>();
+
     await TestBed.configureTestingModule({
       imports: [EmployeeAddEditPageComponent, NoopAnimationsModule],
       providers: [
@@ -32,6 +37,7 @@ describe('EmployeeAddEditPageComponent', () => {
           employees: employeeReducer,
           countries: countryReducer
         }),
+        { provide: Actions, useValue: actions$ },
         {
           provide: ActivatedRoute,
           useValue: {
@@ -69,6 +75,32 @@ describe('EmployeeAddEditPageComponent', () => {
 
   it('should navigate back to /employees when cancel is clicked', () => {
     component.onCancel();
+    expect(router.navigate).toHaveBeenCalledWith(['/employees']);
+  });
+
+  it('should dispatch updateEmployee action when submitting in edit mode', () => {
+    component.isEdit = true;
+    component.employeeId = '42';
+    component.onSubmit(validFormData);
+    expect(store.dispatch).toHaveBeenCalledWith(
+      EmployeeActions.updateEmployee({
+        id: '42',
+        changes: validFormData
+      })
+    );
+  });
+
+  it('should clean up on ngOnDestroy', () => {
+    expect(() => component.ngOnDestroy()).not.toThrow();
+  });
+
+  it('should navigate to /employees when actions$ emits success and form was submitted', () => {
+    (component as any).submitted = true;
+    actions$.next(
+      EmployeeActions.createEmployeeSuccess({
+        employee: { id: '1', ...validFormData }
+      })
+    );
     expect(router.navigate).toHaveBeenCalledWith(['/employees']);
   });
 });

@@ -131,4 +131,47 @@ describe('EmployeeEffects', () => {
       done();
     });
   });
+
+  it('should emit loadEmployeeByIdFailure on search error', (done) => {
+    actions$ = of(EmployeeActions.loadEmployeeById({ id: '99' }));
+    employeeServiceSpy.getEmployeeById.and.returnValue(throwError(() => new Error('Not found')));
+
+    effects.loadEmployeeById$.subscribe((action) => {
+      expect(action.type).toBe(EmployeeActions.loadEmployeeByIdFailure.type);
+      done();
+    });
+  });
+
+  it('should emit createEmployeeFailure on creation error', (done) => {
+    actions$ = of(EmployeeActions.createEmployee({ employee: {} as any }));
+    employeeServiceSpy.createEmployee.and.returnValue(throwError(() => new Error('Creation failed')));
+
+    effects.createEmployee$.subscribe((action) => {
+      expect(notificationServiceSpy.error).toHaveBeenCalled();
+      expect(action.type).toBe(EmployeeActions.createEmployeeFailure.type);
+      done();
+    });
+  });
+
+  it('should emit updateEmployeeFailure on update error', (done) => {
+    actions$ = of(EmployeeActions.updateEmployee({ id: '1', changes: {} }));
+    employeeServiceSpy.updateEmployee.and.returnValue(throwError(() => new Error('Update failed')));
+
+    effects.updateEmployee$.subscribe((action) => {
+      expect(notificationServiceSpy.error).toHaveBeenCalled();
+      expect(action.type).toBe(EmployeeActions.updateEmployeeFailure.type);
+      done();
+    });
+  });
+
+  it('should emit deleteEmployeeFailure on delete error', (done) => {
+    actions$ = of(EmployeeActions.deleteEmployee({ id: '1' }));
+    employeeServiceSpy.deleteEmployee.and.returnValue(throwError(() => new Error('Delete failed')));
+
+    effects.deleteEmployee$.subscribe((action) => {
+      expect(notificationServiceSpy.error).toHaveBeenCalled();
+      expect(action.type).toBe(EmployeeActions.deleteEmployeeFailure.type);
+      done();
+    });
+  });
 });

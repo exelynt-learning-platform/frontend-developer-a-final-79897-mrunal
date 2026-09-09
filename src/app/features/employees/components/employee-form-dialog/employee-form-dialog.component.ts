@@ -46,7 +46,7 @@ export class EmployeeFormDialogComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    this.store.dispatch(loadCountries());
+    this.store.dispatch(loadCountries({}));
 
     this.actions$.pipe(
       ofType(createEmployeeSuccess, updateEmployeeSuccess),

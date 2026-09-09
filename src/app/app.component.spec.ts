@@ -33,4 +33,31 @@ describe('AppComponent', () => {
     expect(compiled.querySelector('app-header')).toBeTruthy();
     expect(compiled.querySelector('app-sidebar')).toBeTruthy();
   });
+
+  it('should toggle drawer when onToggleDrawer is called', () => {
+    const fixture = TestBed.createComponent(AppComponent);
+    fixture.detectChanges();
+    const app = fixture.componentInstance;
+    const drawerSpy = spyOn(app.drawer, 'toggle');
+    app.onToggleDrawer();
+    expect(drawerSpy).toHaveBeenCalled();
+  });
+
+  it('should close drawer on side nav navigate if handset', () => {
+    const fixture = TestBed.createComponent(AppComponent);
+    fixture.detectChanges();
+    const app = fixture.componentInstance;
+    const drawerCloseSpy = spyOn(app.drawer, 'close');
+
+    // Simulate isHandset$ returning true
+    (app as any).isHandset$ = {
+      subscribe: (fn: (val: boolean) => void) => {
+        fn(true);
+        return { unsubscribe: () => {} };
+      }
+    };
+
+    app.onSideNavNavigate();
+    expect(drawerCloseSpy).toHaveBeenCalled();
+  });
 });
