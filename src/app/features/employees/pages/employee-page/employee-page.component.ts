@@ -32,7 +32,8 @@ import {
   selectSearchedEmployee,
   selectSearchLoading,
   selectSearchError,
-  selectActionInProgress
+  selectActionInProgress,
+  selectIsSearching
 } from '../../../../store/employees/employee.selectors';
 import {
   selectCountryTotal
@@ -74,8 +75,7 @@ export class EmployeePageComponent implements OnInit {
   currentSearchTerm: string | null = null;
 
   // Single source of truth for search active state
-  private searchActiveSubject = new BehaviorSubject<boolean>(false);
-  readonly isSearching$: Observable<boolean> = this.searchActiveSubject.asObservable();
+  isSearching$ = this.store.select(selectIsSearching);
 
   constructor(
     private store: Store,
@@ -90,7 +90,6 @@ export class EmployeePageComponent implements OnInit {
 
   onRefresh(): void {
     this.currentSearchTerm = null;
-    this.searchActiveSubject.next(false);
     this.store.dispatch(clearEmployeeSearch());
     this.store.dispatch(loadEmployees());
     this.store.dispatch(loadCountries({ force: true }));
@@ -98,13 +97,11 @@ export class EmployeePageComponent implements OnInit {
 
   onSearch(id: string): void {
     this.currentSearchTerm = id;
-    this.searchActiveSubject.next(true);
     this.store.dispatch(loadEmployeeById({ id }));
   }
 
   onClearSearch(): void {
     this.currentSearchTerm = null;
-    this.searchActiveSubject.next(false);
     this.store.dispatch(clearEmployeeSearch());
   }
 

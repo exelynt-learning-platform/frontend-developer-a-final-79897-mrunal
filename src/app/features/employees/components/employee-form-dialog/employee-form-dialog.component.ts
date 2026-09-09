@@ -9,7 +9,6 @@ import { Subject, filter, takeUntil } from 'rxjs';
 import { Employee, EmployeeFormData } from '../../../../core/models/employee.model';
 import { EmployeeFormComponent } from '../employee-form/employee-form.component';
 import { selectAllCountries, selectCountriesLoading } from '../../../../store/countries/country.selectors';
-import { loadCountries } from '../../../../store/countries/country.actions';
 import { createEmployee, createEmployeeSuccess, updateEmployee, updateEmployeeSuccess } from '../../../../store/employees/employee.actions';
 import { selectActionInProgress } from '../../../../store/employees/employee.selectors';
 
@@ -46,8 +45,6 @@ export class EmployeeFormDialogComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    this.store.dispatch(loadCountries({}));
-
     this.actions$.pipe(
       ofType(createEmployeeSuccess, updateEmployeeSuccess),
       filter(() => this.submitted),

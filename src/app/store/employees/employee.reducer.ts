@@ -23,8 +23,9 @@ export const employeeReducer = createReducer(
     error
   })),
 
-  on(EmployeeActions.loadEmployeeById, (state) => ({
+  on(EmployeeActions.loadEmployeeById, (state, { id }) => ({
     ...state,
+    searchTerm: id,
     searchLoading: true,
     searchError: null,
     searchedEmployee: null
@@ -45,6 +46,7 @@ export const employeeReducer = createReducer(
   })),
   on(EmployeeActions.clearEmployeeSearch, (state) => ({
     ...state,
+    searchTerm: null,
     searchedEmployee: null,
     searchLoading: false,
     searchError: null

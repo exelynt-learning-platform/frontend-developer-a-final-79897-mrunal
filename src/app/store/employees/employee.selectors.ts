@@ -45,6 +45,11 @@ export const selectSearchError = createSelector(
   (state) => state.searchError
 );
 
+export const selectIsSearching = createSelector(
+  selectEmployeeState,
+  (state) => state.searchTerm !== null
+);
+
 export const selectActionInProgress = createSelector(
   selectEmployeeState,
   (state) => state.actionInProgress
