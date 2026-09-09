@@ -2,6 +2,7 @@ import { TestBed } from '@angular/core/testing';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { provideRouter } from '@angular/router';
 import { provideStore } from '@ngrx/store';
+import { of } from 'rxjs';
 import { AppComponent } from './app.component';
 import { employeeReducer } from './store/employees/employee.reducer';
 import { countryReducer } from './store/countries/country.reducer';
@@ -50,12 +51,7 @@ describe('AppComponent', () => {
     const drawerCloseSpy = spyOn(app.drawer, 'close');
 
     // Simulate isHandset$ returning true
-    (app as any).isHandset$ = {
-      subscribe: (fn: (val: boolean) => void) => {
-        fn(true);
-        return { unsubscribe: () => {} };
-      }
-    };
+    (app as any).isHandset$ = of(true);
 
     app.onSideNavNavigate();
     expect(drawerCloseSpy).toHaveBeenCalled();

@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { RouterOutlet } from '@angular/router';
 import { MatSidenav, MatSidenavModule } from '@angular/material/sidenav';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
-import { Observable } from 'rxjs';
+import { Observable, take } from 'rxjs';
 import { map, shareReplay } from 'rxjs/operators';
 
 import { HeaderComponent } from './layout/header/header.component';
@@ -43,7 +43,7 @@ export class AppComponent {
   }
 
   onSideNavNavigate(): void {
-    this.isHandset$.subscribe((isHandset) => {
+    this.isHandset$.pipe(take(1)).subscribe((isHandset) => {
       if (isHandset && this.drawer) {
         this.drawer.close();
       }

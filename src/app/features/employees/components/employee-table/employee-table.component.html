@@ -97,57 +97,11 @@
 
   <!-- Mobile Card List View (transforms automatically on small screens) -->
   <div class="mobile-card-list">
-    <div *ngFor="let emp of employees; trackBy: trackByEmployeeId" class="emp-card mat-elevation-z1">
-      <div class="card-top">
-        <div class="card-profile">
-          <div class="avatar-circle">
-            {{ emp.name.charAt(0).toUpperCase() }}
-          </div>
-          <div class="profile-meta">
-            <h4 class="card-name">{{ emp.name }}</h4>
-            <span class="id-badge">ID: #{{ emp.id }}</span>
-          </div>
-        </div>
-        <div class="card-actions">
-          <button
-            mat-icon-button
-            color="primary"
-            matTooltip="Edit"
-            aria-label="Edit employee"
-            (click)="onEdit(emp)"
-          >
-            <mat-icon>edit</mat-icon>
-          </button>
-          <button
-            mat-icon-button
-            color="warn"
-            matTooltip="Delete"
-            aria-label="Delete employee"
-            (click)="onDelete(emp)"
-          >
-            <mat-icon>delete_outline</mat-icon>
-          </button>
-        </div>
-      </div>
-
-      <div class="card-body">
-        <div class="info-row">
-          <mat-icon class="info-icon">email</mat-icon>
-          <span class="info-val text-truncate">{{ emp.email }}</span>
-        </div>
-        <div class="info-row">
-          <mat-icon class="info-icon">phone</mat-icon>
-          <span class="info-val">{{ emp.mobile }}</span>
-        </div>
-        <div class="info-row">
-          <mat-icon class="info-icon">public</mat-icon>
-          <span class="info-val country-pill">{{ emp.country }}</span>
-        </div>
-        <div class="info-row">
-          <mat-icon class="info-icon">location_on</mat-icon>
-          <span class="info-val">{{ emp.state }}, {{ emp.district }}</span>
-        </div>
-      </div>
-    </div>
+    <app-employee-mobile-card
+      *ngFor="let emp of employees; trackBy: trackByEmployeeId"
+      [employee]="emp"
+      (edit)="onEdit($event)"
+      (delete)="onDelete($event)"
+    ></app-employee-mobile-card>
   </div>
 </div>

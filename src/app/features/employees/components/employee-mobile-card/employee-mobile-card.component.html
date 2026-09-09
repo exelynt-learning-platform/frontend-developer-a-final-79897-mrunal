@@ -1,0 +1,52 @@
+<div class="emp-card">
+  <div class="card-top">
+    <div class="card-profile">
+      <div class="avatar-circle" aria-hidden="true">
+        {{ employee.name.charAt(0).toUpperCase() }}
+      </div>
+      <div class="profile-meta">
+        <h4 class="card-name">{{ employee.name }}</h4>
+        <span class="id-badge">ID: #{{ employee.id }}</span>
+      </div>
+    </div>
+    <div class="card-actions">
+      <button
+        mat-icon-button
+        color="primary"
+        matTooltip="Edit"
+        aria-label="Edit employee"
+        (click)="onEdit()"
+      >
+        <mat-icon>edit</mat-icon>
+      </button>
+      <button
+        mat-icon-button
+        color="warn"
+        matTooltip="Delete"
+        aria-label="Delete employee"
+        (click)="onDelete()"
+      >
+        <mat-icon>delete_outline</mat-icon>
+      </button>
+    </div>
+  </div>
+
+  <div class="card-body">
+    <div class="info-row">
+      <mat-icon class="info-icon">email</mat-icon>
+      <span class="info-val text-truncate">{{ employee.email }}</span>
+    </div>
+    <div class="info-row">
+      <mat-icon class="info-icon">phone</mat-icon>
+      <span class="info-val">{{ employee.mobile }}</span>
+    </div>
+    <div class="info-row">
+      <mat-icon class="info-icon">public</mat-icon>
+      <span class="info-val country-pill">{{ employee.country }}</span>
+    </div>
+    <div class="info-row">
+      <mat-icon class="info-icon">location_on</mat-icon>
+      <span class="info-val">{{ employee.state }}, {{ employee.district }}</span>
+    </div>
+  </div>
+</div>

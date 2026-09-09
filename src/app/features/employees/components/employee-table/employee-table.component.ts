@@ -6,6 +6,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatChipsModule } from '@angular/material/chips';
 import { Employee } from '../../../../core/models/employee.model';
+import { EmployeeMobileCardComponent } from '../employee-mobile-card/employee-mobile-card.component';
 
 @Component({
   selector: 'app-employee-table',
@@ -16,7 +17,8 @@ import { Employee } from '../../../../core/models/employee.model';
     MatButtonModule,
     MatIconModule,
     MatTooltipModule,
-    MatChipsModule
+    MatChipsModule,
+    EmployeeMobileCardComponent
   ],
   templateUrl: './employee-table.component.html',
   styleUrls: ['./employee-table.component.scss'],

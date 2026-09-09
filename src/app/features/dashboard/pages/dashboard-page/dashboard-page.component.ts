@@ -1,4 +1,5 @@
-import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy, DestroyRef, inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
@@ -40,18 +41,21 @@ import { LoadingStateComponent } from '../../../../shared/components/loading-sta
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class DashboardPageComponent implements OnInit {
-  totalEmployees$ = this.store.select(selectEmployeeTotal);
-  totalCountries$ = this.store.select(selectCountryTotal);
-  employeesLoading$ = this.store.select(selectEmployeesLoading);
-  countriesLoading$ = this.store.select(selectCountriesLoading);
+  private readonly destroyRef = inject(DestroyRef);
+
+  totalEmployees$ = this.store.select(selectEmployeeTotal).pipe(takeUntilDestroyed(this.destroyRef));
+  totalCountries$ = this.store.select(selectCountryTotal).pipe(takeUntilDestroyed(this.destroyRef));
+  employeesLoading$ = this.store.select(selectEmployeesLoading).pipe(takeUntilDestroyed(this.destroyRef));
+  countriesLoading$ = this.store.select(selectCountriesLoading).pipe(takeUntilDestroyed(this.destroyRef));
 
   // Recently added employees (top 5 sorted by id or createdAt)
   recentEmployees$: Observable<Employee[]> = this.store.select(selectAllEmployees).pipe(
-    map((employees) => employees.slice(0, 5))
+    map((employees) => employees.slice(0, 5)),
+    takeUntilDestroyed(this.destroyRef)
   );
 
   // Country presence list
-  countries$ = this.store.select(selectAllCountries);
+  countries$ = this.store.select(selectAllCountries).pipe(takeUntilDestroyed(this.destroyRef));
 
   constructor(private store: Store) {}
 
