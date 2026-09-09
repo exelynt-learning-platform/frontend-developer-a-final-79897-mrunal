@@ -47,14 +47,35 @@ export function mapEmployeeDtoToEmployee(dto: EmployeeDto): Employee {
 }
 
 export function mapEmployeeToDto(employee: Partial<EmployeeFormData>): Partial<EmployeeDto> {
-  return {
-    ...employee,
-    name: employee.name ? employee.name.trim() : undefined,
-    email: employee.email ? employee.email.trim() : undefined,
-    emailId: employee.email ? employee.email.trim() : undefined,
-    mobile: employee.mobile ? employee.mobile.trim() : undefined,
-    country: employee.country ? employee.country.trim() : undefined,
-    state: employee.state ? employee.state.trim() : undefined,
-    district: employee.district ? employee.district.trim() : undefined
-  };
+  if (!employee) {
+    return {};
+  }
+
+  const dto: Record<string, unknown> = { ...employee };
+
+  if (employee.name !== undefined) {
+    dto['name'] = typeof employee.name === 'string' ? employee.name.trim() : employee.name;
+  }
+  if (employee.email !== undefined) {
+    const trimmedEmail = typeof employee.email === 'string' ? employee.email.trim() : employee.email;
+    dto['email'] = trimmedEmail;
+    dto['emailId'] = trimmedEmail;
+  }
+  if (employee.mobile !== undefined) {
+    dto['mobile'] = typeof employee.mobile === 'string' ? employee.mobile.trim() : employee.mobile;
+  }
+  if (employee.country !== undefined) {
+    dto['country'] = typeof employee.country === 'string' ? employee.country.trim() : employee.country;
+  }
+  if (employee.state !== undefined) {
+    dto['state'] = typeof employee.state === 'string' ? employee.state.trim() : employee.state;
+  }
+  if (employee.district !== undefined) {
+    dto['district'] = typeof employee.district === 'string' ? employee.district.trim() : employee.district;
+  }
+
+  return Object.fromEntries(
+    Object.entries(dto).filter(([_, value]) => value !== undefined)
+  ) as Partial<EmployeeDto>;
 }
+

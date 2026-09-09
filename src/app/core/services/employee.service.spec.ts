@@ -108,6 +108,10 @@ describe('EmployeeService', () => {
 
     const req = httpMock.expectOne(baseUrl + '/1');
     expect(req.request.method).toBe('PUT');
+    expect(req.request.body).toEqual({
+      name: 'Alice Cooper',
+      mobile: '9998887776'
+    });
     req.flush({ ...mockEmployeeDtos[0], name: 'Alice Cooper', mobile: '9998887776' });
   });
 
