@@ -35,7 +35,6 @@ import {
   selectActionInProgress
 } from '../../../../store/employees/employee.selectors';
 import {
-  selectAllCountries,
   selectCountryTotal
 } from '../../../../store/countries/country.selectors';
 import { loadCountries } from '../../../../store/countries/country.actions';
