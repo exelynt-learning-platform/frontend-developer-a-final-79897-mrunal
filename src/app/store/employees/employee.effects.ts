@@ -39,8 +39,8 @@ export class EmployeeEffects {
           catchError((error) => {
             const is404 = error.status === 404 || error?.originalError?.status === 404;
             const message = is404
-              ? 'No employee found with ID ' + id + '.'
-              : (error.message || 'Unable to load employee with ID ' + id + '.');
+              ? `No employee found with ID ${id}.`
+              : (error.message || `Unable to load employee with ID ${id}.`);
             return of(EmployeeActions.loadEmployeeByIdFailure({ error: message }));
           })
         )

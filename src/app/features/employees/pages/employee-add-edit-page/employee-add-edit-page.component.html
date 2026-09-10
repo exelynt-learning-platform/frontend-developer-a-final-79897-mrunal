@@ -26,8 +26,15 @@
         message="Loading employee details..."
       ></app-loading-state>
 
+      <app-error-state
+        *ngIf="isEdit && !employee && (error$ | async) && !(loading$ | async)"
+        title="Employee Not Found"
+        [message]="(error$ | async) || 'Unable to load employee details.'"
+        (retry)="onRetry()"
+      ></app-error-state>
+
       <app-employee-form
-        *ngIf="!isEdit || employee"
+        *ngIf="(!isEdit || employee) && !(error$ | async)"
         [employee]="employee"
         [countries]="(countries$ | async) || []"
         [countriesLoading]="(countriesLoading$ | async) || false"

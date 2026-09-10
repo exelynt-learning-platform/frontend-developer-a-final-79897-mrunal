@@ -46,6 +46,21 @@ export function mapEmployeeDtoToEmployee(dto: EmployeeDto): Employee {
   };
 }
 
+function trimValue<T>(value: T): T {
+  return (typeof value === 'string' ? value.trim() : value) as T;
+}
+
+function assignExtraProperties(
+  target: Partial<EmployeeDto>,
+  source: Partial<EmployeeFormData & EmployeeDto>
+): void {
+  for (const [key, value] of Object.entries(source)) {
+    if (value !== undefined && !(key in target)) {
+      Object.assign(target, { [key]: trimValue(value) });
+    }
+  }
+}
+
 export function mapEmployeeToDto(
   employee: Partial<EmployeeFormData & EmployeeDto>
 ): Partial<EmployeeDto> {
@@ -56,7 +71,7 @@ export function mapEmployeeToDto(
   const dto: Partial<EmployeeDto> = {};
 
   if (employee.id !== undefined) {
-    dto.id = typeof employee.id === 'string' ? employee.id.trim() : employee.id;
+    dto.id = trimValue(employee.id);
   }
   if (employee.name !== undefined) {
     dto.name = employee.name.trim();
@@ -85,11 +100,7 @@ export function mapEmployeeToDto(
     dto.createdAt = employee.createdAt.trim();
   }
 
-  for (const [key, value] of Object.entries(employee)) {
-    if (value !== undefined && !(key in dto)) {
-      Object.assign(dto, { [key]: typeof value === 'string' ? value.trim() : value });
-    }
-  }
+  assignExtraProperties(dto, employee);
 
   return dto;
 }

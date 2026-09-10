@@ -32,7 +32,6 @@
       mat-button
       type="button"
       class="cancel-btn"
-      [disabled]="data.isDeleting"
       (click)="onCancel()"
     >
       Cancel
@@ -42,16 +41,9 @@
       color="warn"
       type="button"
       class="delete-btn"
-      [disabled]="data.isDeleting"
       (click)="onConfirm()"
     >
-      <mat-progress-spinner
-        *ngIf="data.isDeleting"
-        mode="indeterminate"
-        diameter="18"
-        class="spinner-inline"
-      ></mat-progress-spinner>
-      <span>{{ data.isDeleting ? 'Deleting...' : 'Delete' }}</span>
+      <span>Delete</span>
     </button>
   </mat-dialog-actions>
 </div>

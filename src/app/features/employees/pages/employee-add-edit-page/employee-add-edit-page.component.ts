@@ -6,10 +6,11 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { Actions, ofType } from '@ngrx/effects';
 import { Store } from '@ngrx/store';
-import { Observable, Subject, takeUntil, map } from 'rxjs';
+import { Observable, Subject, takeUntil, map, filter, take } from 'rxjs';
 import { Employee, EmployeeFormData } from '../../../../core/models/employee.model';
 import { EmployeeFormComponent } from '../../components/employee-form/employee-form.component';
 import { LoadingStateComponent } from '../../../../shared/components/loading-state/loading-state.component';
+import { ErrorStateComponent } from '../../../../shared/components/error-state/error-state.component';
 import { selectAllCountries, selectCountriesLoading } from '../../../../store/countries/country.selectors';
 import { loadCountries } from '../../../../store/countries/country.actions';
 import {
@@ -22,7 +23,8 @@ import {
 import {
   selectEmployeeById,
   selectActionInProgress,
-  selectEmployeesLoading
+  selectSearchLoading,
+  selectSearchError
 } from '../../../../store/employees/employee.selectors';
 
 @Component({
@@ -35,7 +37,8 @@ import {
     MatButtonModule,
     MatIconModule,
     EmployeeFormComponent,
-    LoadingStateComponent
+    LoadingStateComponent,
+    ErrorStateComponent
   ],
   templateUrl: './employee-add-edit-page.component.html',
   styleUrls: ['./employee-add-edit-page.component.scss']
@@ -48,7 +51,8 @@ export class EmployeeAddEditPageComponent implements OnInit, OnDestroy {
   countries$ = this.store.select(selectAllCountries);
   countriesLoading$ = this.store.select(selectCountriesLoading);
   submitting$ = this.store.select(selectActionInProgress);
-  loading$ = this.store.select(selectEmployeesLoading);
+  loading$ = this.store.select(selectSearchLoading);
+  error$ = this.store.select(selectSearchError);
 
   private destroy$ = new Subject<void>();
   private submitted = false;
@@ -70,11 +74,13 @@ export class EmployeeAddEditPageComponent implements OnInit, OnDestroy {
       this.store.dispatch(loadEmployeeById({ id: this.employeeId }));
       this.store
         .select(selectEmployeeById(this.employeeId))
-        .pipe(takeUntil(this.destroy$))
+        .pipe(
+          filter((emp): emp is Employee => !!emp),
+          take(1),
+          takeUntil(this.destroy$)
+        )
         .subscribe((emp) => {
-          if (emp) {
-            this.employee = emp;
-          }
+          this.employee = emp;
         });
     }
 
@@ -109,5 +115,11 @@ export class EmployeeAddEditPageComponent implements OnInit, OnDestroy {
 
   onCancel(): void {
     this.router.navigate(['/employees']);
+  }
+
+  onRetry(): void {
+    if (this.employeeId) {
+      this.store.dispatch(loadEmployeeById({ id: this.employeeId }));
+    }
   }
 }

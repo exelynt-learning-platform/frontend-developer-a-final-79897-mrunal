@@ -119,4 +119,17 @@ describe('EmployeeAddEditPageComponent', () => {
 
     expect(component.employee).toEqual(employee);
   });
+
+  it('should dispatch loadEmployeeById when onRetry is invoked in edit mode', () => {
+    component.employeeId = '42';
+    component.onRetry();
+    expect(store.dispatch).toHaveBeenCalledWith(EmployeeActions.loadEmployeeById({ id: '42' }));
+  });
+
+  it('should not dispatch loadEmployeeById when onRetry is invoked without employeeId', () => {
+    component.employeeId = null;
+    (store.dispatch as jasmine.Spy).calls.reset();
+    component.onRetry();
+    expect(store.dispatch).not.toHaveBeenCalled();
+  });
 });

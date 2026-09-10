@@ -24,7 +24,7 @@ export class EmployeeService {
   }
 
   getEmployeeById(id: string): Observable<Employee> {
-    const url = this.baseUrl + '/' + id;
+    const url = `${this.baseUrl}/${id}`;
     return this.http.get<EmployeeDto>(url).pipe(
       map(mapEmployeeDtoToEmployee)
     );
@@ -38,7 +38,7 @@ export class EmployeeService {
   }
 
   updateEmployee(id: string, employee: Partial<EmployeeFormData>): Observable<Employee> {
-    const url = this.baseUrl + '/' + id;
+    const url = `${this.baseUrl}/${id}`;
     const payload = mapEmployeeToDto(employee);
     return this.http.put<EmployeeDto>(url, payload).pipe(
       map(mapEmployeeDtoToEmployee)
@@ -46,7 +46,7 @@ export class EmployeeService {
   }
 
   deleteEmployee(id: string): Observable<string> {
-    const url = this.baseUrl + '/' + id;
+    const url = `${this.baseUrl}/${id}`;
     return this.http.delete<unknown>(url).pipe(
       map(() => id)
     );
