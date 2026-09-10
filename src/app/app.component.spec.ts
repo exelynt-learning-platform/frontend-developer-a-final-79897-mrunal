@@ -2,13 +2,19 @@ import { TestBed } from '@angular/core/testing';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { provideRouter } from '@angular/router';
 import { provideStore } from '@ngrx/store';
+import { BreakpointObserver } from '@angular/cdk/layout';
 import { of } from 'rxjs';
 import { AppComponent } from './app.component';
 import { employeeReducer } from './store/employees/employee.reducer';
 import { countryReducer } from './store/countries/country.reducer';
 
 describe('AppComponent', () => {
+  let breakpointObserver: jasmine.SpyObj<BreakpointObserver>;
+
   beforeEach(async () => {
+    breakpointObserver = jasmine.createSpyObj('BreakpointObserver', ['observe']);
+    breakpointObserver.observe.and.returnValue(of({ matches: false, breakpoints: {} }));
+
     await TestBed.configureTestingModule({
       imports: [AppComponent, NoopAnimationsModule],
       providers: [
@@ -16,7 +22,8 @@ describe('AppComponent', () => {
         provideStore({
           employees: employeeReducer,
           countries: countryReducer
-        })
+        }),
+        { provide: BreakpointObserver, useValue: breakpointObserver }
       ]
     }).compileComponents();
   });
@@ -45,13 +52,11 @@ describe('AppComponent', () => {
   });
 
   it('should close drawer on side nav navigate if handset', () => {
+    breakpointObserver.observe.and.returnValue(of({ matches: true, breakpoints: {} }));
     const fixture = TestBed.createComponent(AppComponent);
     fixture.detectChanges();
     const app = fixture.componentInstance;
     const drawerCloseSpy = spyOn(app.drawer, 'close');
-
-    // Simulate isHandset$ returning true
-    (app as any).isHandset$ = of(true);
 
     app.onSideNavNavigate();
     expect(drawerCloseSpy).toHaveBeenCalled();

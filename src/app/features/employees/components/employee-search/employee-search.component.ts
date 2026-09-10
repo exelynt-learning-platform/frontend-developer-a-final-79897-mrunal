@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output, OnInit, ChangeDetectionStrategy } from '@angular/core';
+import { Component, EventEmitter, Input, Output, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -23,7 +23,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
   styleUrls: ['./employee-search.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class EmployeeSearchComponent implements OnInit {
+export class EmployeeSearchComponent {
   @Input() loading = false;
   @Input() set searchId(val: string | null) {
     if (val !== this.searchControl.value) {
@@ -35,8 +35,6 @@ export class EmployeeSearchComponent implements OnInit {
   @Output() clear = new EventEmitter<void>();
 
   searchControl = new FormControl('', [Validators.pattern('^[0-9]+$')]);
-
-  ngOnInit(): void {}
 
   onSearch(): void {
     const value = (this.searchControl.value || '').trim();

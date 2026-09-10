@@ -75,7 +75,7 @@ describe('EmployeeFormDialogComponent', () => {
   });
 
   it('should dispatch createEmployee action on submit in add mode', () => {
-    (component as any).data = {};
+    component.data = {};
     component.onSubmit(validFormData);
     expect(store.dispatch).toHaveBeenCalledWith(
       EmployeeActions.createEmployee({ employee: validFormData })

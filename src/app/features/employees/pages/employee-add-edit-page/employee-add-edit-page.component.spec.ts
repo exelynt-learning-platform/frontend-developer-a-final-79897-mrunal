@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
-import { ActivatedRoute, Router, provideRouter } from '@angular/router';
+import { ActivatedRoute, ParamMap, Router, provideRouter } from '@angular/router';
 import { provideStore, Store, Action } from '@ngrx/store';
 import { Actions } from '@ngrx/effects';
 import { Subject } from 'rxjs';
@@ -16,6 +16,7 @@ describe('EmployeeAddEditPageComponent', () => {
   let router: Router;
   let store: Store;
   let actions$: Subject<Action>;
+  let routeParamMap: jasmine.SpyObj<ParamMap>;
 
   const validFormData: EmployeeFormData = {
     name: 'Rohit Sharma',
@@ -28,6 +29,8 @@ describe('EmployeeAddEditPageComponent', () => {
 
   beforeEach(async () => {
     actions$ = new Subject<Action>();
+    routeParamMap = jasmine.createSpyObj<ParamMap>('ParamMap', ['get']);
+    routeParamMap.get.and.returnValue(null);
 
     await TestBed.configureTestingModule({
       imports: [EmployeeAddEditPageComponent, NoopAnimationsModule],
@@ -42,9 +45,7 @@ describe('EmployeeAddEditPageComponent', () => {
           provide: ActivatedRoute,
           useValue: {
             snapshot: {
-              paramMap: {
-                get: (key: string) => (key === 'id' ? null : null)
-              }
+              paramMap: routeParamMap
             }
           }
         }
@@ -95,7 +96,7 @@ describe('EmployeeAddEditPageComponent', () => {
   });
 
   it('should navigate to /employees when actions$ emits success and form was submitted', () => {
-    (component as any).submitted = true;
+    component.onSubmit(validFormData);
     actions$.next(
       EmployeeActions.createEmployeeSuccess({
         employee: { id: '1', ...validFormData }
@@ -105,8 +106,7 @@ describe('EmployeeAddEditPageComponent', () => {
   });
 
   it('should initialize edit mode, load the employee, and retain it from the store', () => {
-    const route = TestBed.inject(ActivatedRoute);
-    route.snapshot.paramMap.get = () => '42';
+    routeParamMap.get.and.returnValue('42');
     component.ngOnDestroy();
     component.ngOnInit();
 

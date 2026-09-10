@@ -45,9 +45,9 @@ describe('Employee Selectors', () => {
       searchedEmployee: sampleEmployee1,
       searchLoading: false,
       searchError: null,
-      actionInProgress: true
-      ,actionError: 'Action failed'
-      ,selectedEmployeeId: '2'
+      actionInProgress: true,
+      actionError: 'Action failed',
+      selectedEmployeeId: '2'
     })
   };
 
