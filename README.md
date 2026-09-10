@@ -2,6 +2,8 @@
 
 An enterprise-grade, responsive, and accessible Employee Management System built with **Angular 17+**, **NgRx (Store, Effects, Entity)**, **Angular Material**, **Reactive Forms**, and **RxJS**.
 
+See [REQUIREMENTS.md](REQUIREMENTS.md) for the assessment traceability matrix and the distinction between automated verification and manual review items.
+
 ---
 
 ## ?? Key Features
@@ -179,7 +181,7 @@ export const environment = {
 
 ## ?? Testing Suite
 
-The project includes **54 automated unit tests** covering business-critical paths:
+The project includes **169 automated unit tests** covering business-critical paths:
 
 - **EmployeeService**: Mock HTTP testing for GET, GET by ID, POST, PUT, DELETE, and 500 status propagation.
 - **CountryService**: Mock HTTP testing for country list and error fallback.
@@ -196,7 +198,7 @@ The project includes **54 automated unit tests** covering business-critical path
 ```bash
 npm test -- --watch=false --browsers=ChromeHeadless
 ```
-**Result**: 54 SUCCESS (100% passing)
+**Result**: 169 SUCCESS (100% passing)
 
 ---
 

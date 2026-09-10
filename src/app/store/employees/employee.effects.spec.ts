@@ -1,6 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 import { provideMockActions } from '@ngrx/effects/testing';
-import { Observable, of, throwError } from 'rxjs';
+import { Observable, of, Subject, throwError } from 'rxjs';
 import { EmployeeEffects } from './employee.effects';
 import * as EmployeeActions from './employee.actions';
 import { EmployeeService } from '../../core/services/employee.service';
@@ -82,6 +82,29 @@ describe('EmployeeEffects', () => {
       );
       done();
     });
+  });
+
+  it('should cancel a stale employee list request when a newer load starts', (done) => {
+    const actionsSubject = new Subject<any>();
+    const firstRequest = new Subject<Employee[]>();
+    const secondRequest = new Subject<Employee[]>();
+    actions$ = actionsSubject;
+    employeeServiceSpy.getEmployees.and.returnValues(firstRequest, secondRequest);
+    const results: Employee[][] = [];
+
+    effects.loadEmployees$.subscribe((action) => {
+      if (action.type === EmployeeActions.loadEmployeesSuccess.type) {
+        results.push(action.employees);
+      }
+    });
+
+    actionsSubject.next(EmployeeActions.loadEmployees());
+    actionsSubject.next(EmployeeActions.loadEmployees());
+    firstRequest.next([{ ...mockEmployee, id: 'stale' }]);
+    secondRequest.next([mockEmployee]);
+
+    expect(results).toEqual([[mockEmployee]]);
+    done();
   });
 
   it('should search employee by ID and emit loadEmployeeByIdSuccess on success', (done) => {

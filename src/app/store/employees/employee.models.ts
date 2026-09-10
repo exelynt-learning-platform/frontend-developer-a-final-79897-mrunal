@@ -15,6 +15,7 @@ export interface EmployeeState extends EntityState<Employee> {
 
 export const employeeAdapter: EntityAdapter<Employee> = createEntityAdapter<Employee>({
   selectId: (employee: Employee) => employee.id,
+  // Numeric IDs sort descending; mixed or nonnumeric IDs sort alphabetically by name.
   sortComparer: compareEmployees
 });
 

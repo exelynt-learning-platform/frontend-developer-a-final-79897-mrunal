@@ -30,6 +30,7 @@
   </header>
 
   <!-- Summary Cards -->
+  <ng-container *ngIf="totalEmployees$ | async as totalEmployees">
   <section class="summary-cards-row" aria-label="Employee summary statistics">
     <mat-card class="stat-card">
       <div class="stat-icon-box icon-indigo">
@@ -37,7 +38,7 @@
       </div>
       <div class="stat-info">
         <span class="stat-label">Total Employees</span>
-        <h3 class="stat-value">{{ (totalEmployees$ | async) ?? 0 }}</h3>
+        <h3 class="stat-value">{{ totalEmployees }}</h3>
       </div>
     </mat-card>
 
@@ -57,10 +58,11 @@
       </div>
       <div class="stat-info">
         <span class="stat-label">Active Records</span>
-        <h3 class="stat-value">{{ (totalEmployees$ | async) ?? 0 }} Active</h3>
+        <h3 class="stat-value">{{ totalEmployees }} Active</h3>
       </div>
     </mat-card>
   </section>
+  </ng-container>
 
   <!-- Main Content Card -->
   <mat-card class="table-card mat-elevation-z1">
@@ -130,16 +132,17 @@
 
     <!-- State 6: Regular Listing (No search active) -->
     <ng-container *ngIf="!(isSearching$ | async) && !(loading$ | async) && !(error$ | async)">
+      <ng-container *ngIf="employees$ | async as employees">
       <app-employee-table
-        *ngIf="((employees$ | async)?.length || 0) > 0"
-        [employees]="(employees$ | async) || []"
+        *ngIf="employees.length > 0"
+        [employees]="employees"
         (edit)="onEditEmployee($event)"
         (delete)="onDeleteEmployee($event)"
       ></app-employee-table>
 
       <!-- Empty State when 0 employees exist -->
       <app-empty-state
-        *ngIf="((employees$ | async)?.length || 0) === 0"
+        *ngIf="employees.length === 0"
         icon="person_add"
         title="No Employees Found"
         message="Your employee database is currently empty. Start onboarding personnel."
@@ -147,6 +150,7 @@
         actionIcon="add"
         (actionClick)="onAddEmployee()"
       ></app-empty-state>
+      </ng-container>
     </ng-container>
   </mat-card>
 </div>

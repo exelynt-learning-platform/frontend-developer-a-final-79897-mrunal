@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Input, OnInit, OnChanges, Output, SimpleChanges, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, ReactiveFormsModule, ValidationErrors, Validators } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
@@ -10,6 +10,21 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { Employee, EmployeeFormData } from '../../../../core/models/employee.model';
 import { Country } from '../../../../core/models/country.model';
 import { CustomValidators } from '../../../../core/validators/custom-validators';
+
+const requiredFieldMessages: Record<string, string> = {
+  name: 'Name is required.',
+  email: 'Email is required.',
+  mobile: 'Mobile number is required.',
+  country: 'Country is required.',
+  state: 'State is required.',
+  district: 'District is required.'
+};
+
+const staticErrorMessages: Record<string, string> = {
+  whitespaceOnly: 'Field cannot contain only whitespace.',
+  invalidEmail: 'Please enter a valid email address.',
+  invalidMobile: 'Please enter a valid mobile number (7-15 digits).'
+};
 
 @Component({
   selector: 'app-employee-form',
@@ -123,26 +138,15 @@ export class EmployeeFormComponent implements OnInit, OnChanges {
     const control = this.employeeForm.get(fieldName);
     if (!control || !control.errors) return '';
 
-    if (control.hasError('required')) {
-      if (fieldName === 'name') return 'Name is required.';
-      if (fieldName === 'email') return 'Email is required.';
-      if (fieldName === 'mobile') return 'Mobile number is required.';
-      if (fieldName === 'country') return 'Country is required.';
-      if (fieldName === 'state') return 'State is required.';
-      if (fieldName === 'district') return 'District is required.';
-      return 'This field is required.';
+    const requiredMessage = this.getRequiredMessage(fieldName, control.errors);
+    if (requiredMessage) {
+      return requiredMessage;
     }
 
-    if (control.hasError('whitespaceOnly')) {
-      return 'Field cannot contain only whitespace.';
-    }
-
-    if (control.hasError('invalidEmail')) {
-      return 'Please enter a valid email address.';
-    }
-
-    if (control.hasError('invalidMobile')) {
-      return 'Please enter a valid mobile number (7-15 digits).';
+    for (const [errorKey, message] of Object.entries(staticErrorMessages)) {
+      if (control.hasError(errorKey)) {
+        return message;
+      }
     }
 
     if (control.hasError('minlength')) {
@@ -156,6 +160,14 @@ export class EmployeeFormComponent implements OnInit, OnChanges {
     }
 
     return 'Invalid input.';
+  }
+
+  private getRequiredMessage(fieldName: string, errors: ValidationErrors): string | null {
+    if (!errors['required']) {
+      return null;
+    }
+
+    return requiredFieldMessages[fieldName] || 'This field is required.';
   }
 
   onSubmit(): void {

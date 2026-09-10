@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { of } from 'rxjs';
-import { map, mergeMap, catchError } from 'rxjs/operators';
+import { map, mergeMap, switchMap, catchError } from 'rxjs/operators';
 import { EmployeeService } from '../../core/services/employee.service';
 import { NotificationService } from '../../core/services/notification.service';
 import * as EmployeeActions from './employee.actions';
@@ -15,7 +15,7 @@ export class EmployeeEffects {
   loadEmployees$ = createEffect(() =>
     this.actions$.pipe(
       ofType(EmployeeActions.loadEmployees),
-      mergeMap(() =>
+      switchMap(() =>
         this.employeeService.getEmployees().pipe(
           map((employees) => EmployeeActions.loadEmployeesSuccess({ employees })),
           catchError((error) =>
