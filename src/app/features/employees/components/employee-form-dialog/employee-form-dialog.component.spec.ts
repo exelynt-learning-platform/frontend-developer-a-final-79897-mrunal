@@ -1,7 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { provideStore, Store } from '@ngrx/store';
+import { provideStore, ScannedActionsSubject, Store } from '@ngrx/store';
 import { EmployeeFormDialogComponent, FormDialogData } from './employee-form-dialog.component';
 import { employeeReducer } from '../../../../store/employees/employee.reducer';
 import { countryReducer } from '../../../../store/countries/country.reducer';
@@ -13,6 +13,7 @@ describe('EmployeeFormDialogComponent', () => {
   let fixture: ComponentFixture<EmployeeFormDialogComponent>;
   let dialogRefSpy: jasmine.SpyObj<MatDialogRef<EmployeeFormDialogComponent>>;
   let store: Store;
+  let actionsSubject: ScannedActionsSubject;
 
   const mockEmployee: Employee = {
     id: '7',
@@ -49,6 +50,7 @@ describe('EmployeeFormDialogComponent', () => {
     }).compileComponents();
 
     store = TestBed.inject(Store);
+    actionsSubject = TestBed.inject(ScannedActionsSubject);
     spyOn(store, 'dispatch');
 
     fixture = TestBed.createComponent(EmployeeFormDialogComponent);
@@ -82,5 +84,15 @@ describe('EmployeeFormDialogComponent', () => {
 
   it('should clean up subscriptions on ngOnDestroy', () => {
     expect(() => component.ngOnDestroy()).not.toThrow();
+  });
+
+  it('should close only after a submitted form succeeds', () => {
+    actionsSubject.next(EmployeeActions.createEmployeeSuccess({ employee: mockEmployee }));
+    expect(dialogRefSpy.close).not.toHaveBeenCalled();
+
+    component.onSubmit(validFormData);
+    actionsSubject.next(EmployeeActions.updateEmployeeSuccess({ employee: mockEmployee }));
+
+    expect(dialogRefSpy.close).toHaveBeenCalledWith(true);
   });
 });

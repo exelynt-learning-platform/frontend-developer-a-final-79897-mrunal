@@ -54,7 +54,7 @@ describe('EmployeeAddEditPageComponent', () => {
     router = TestBed.inject(Router);
     store = TestBed.inject(Store);
     spyOn(router, 'navigate');
-    spyOn(store, 'dispatch');
+    spyOn(store, 'dispatch').and.callThrough();
 
     fixture = TestBed.createComponent(EmployeeAddEditPageComponent);
     component = fixture.componentInstance;
@@ -102,5 +102,21 @@ describe('EmployeeAddEditPageComponent', () => {
       })
     );
     expect(router.navigate).toHaveBeenCalledWith(['/employees']);
+  });
+
+  it('should initialize edit mode, load the employee, and retain it from the store', () => {
+    const route = TestBed.inject(ActivatedRoute);
+    route.snapshot.paramMap.get = () => '42';
+    component.ngOnDestroy();
+    component.ngOnInit();
+
+    expect(component.isEdit).toBeTrue();
+    expect(component.employeeId).toBe('42');
+    expect(store.dispatch).toHaveBeenCalledWith(EmployeeActions.loadEmployeeById({ id: '42' }));
+
+    const employee = { id: '42', ...validFormData };
+    store.dispatch(EmployeeActions.loadEmployeeByIdSuccess({ employee }));
+
+    expect(component.employee).toEqual(employee);
   });
 });

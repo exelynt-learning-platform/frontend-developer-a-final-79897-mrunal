@@ -6,7 +6,7 @@ export const countryReducer = createReducer(
   initialCountryState,
   on(CountryActions.loadCountries, (state, action) => ({
     ...state,
-    loading: action.force ? true : !state.loaded,
+    loading: Boolean(action.force) || !state.loaded,
     error: null
   })),
   on(CountryActions.loadCountriesSuccess, (state, { countries }) =>

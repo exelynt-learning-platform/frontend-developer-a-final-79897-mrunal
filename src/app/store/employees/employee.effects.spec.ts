@@ -72,6 +72,18 @@ describe('EmployeeEffects', () => {
     });
   });
 
+  it('should use the fallback message when loading employees fails without a message', (done) => {
+    actions$ = of(EmployeeActions.loadEmployees());
+    employeeServiceSpy.getEmployees.and.returnValue(throwError(() => ({})));
+
+    effects.loadEmployees$.subscribe((action) => {
+      expect(action).toEqual(
+        EmployeeActions.loadEmployeesFailure({ error: 'Unable to load employees. Please try again.' })
+      );
+      done();
+    });
+  });
+
   it('should search employee by ID and emit loadEmployeeByIdSuccess on success', (done) => {
     actions$ = of(EmployeeActions.loadEmployeeById({ id: '1' }));
     employeeServiceSpy.getEmployeeById.and.returnValue(of(mockEmployee));
@@ -142,6 +154,44 @@ describe('EmployeeEffects', () => {
     });
   });
 
+  it('should return a not-found message for a 404 search error', (done) => {
+    actions$ = of(EmployeeActions.loadEmployeeById({ id: '99' }));
+    employeeServiceSpy.getEmployeeById.and.returnValue(throwError(() => ({ status: 404 })));
+
+    effects.loadEmployeeById$.subscribe((action) => {
+      expect(action).toEqual(
+        EmployeeActions.loadEmployeeByIdFailure({ error: 'No employee found with ID 99.' })
+      );
+      done();
+    });
+  });
+
+  it('should recognize a not-found error nested in the original error', (done) => {
+    actions$ = of(EmployeeActions.loadEmployeeById({ id: '98' }));
+    employeeServiceSpy.getEmployeeById.and.returnValue(
+      throwError(() => ({ originalError: { status: 404 } }))
+    );
+
+    effects.loadEmployeeById$.subscribe((action) => {
+      expect(action).toEqual(
+        EmployeeActions.loadEmployeeByIdFailure({ error: 'No employee found with ID 98.' })
+      );
+      done();
+    });
+  });
+
+  it('should use the search fallback message for an unknown search error', (done) => {
+    actions$ = of(EmployeeActions.loadEmployeeById({ id: '97' }));
+    employeeServiceSpy.getEmployeeById.and.returnValue(throwError(() => ({})));
+
+    effects.loadEmployeeById$.subscribe((action) => {
+      expect(action).toEqual(
+        EmployeeActions.loadEmployeeByIdFailure({ error: 'Unable to load employee with ID 97.' })
+      );
+      done();
+    });
+  });
+
   it('should emit createEmployeeFailure on creation error', (done) => {
     actions$ = of(EmployeeActions.createEmployee({ employee: {} as any }));
     employeeServiceSpy.createEmployee.and.returnValue(throwError(() => new Error('Creation failed')));
@@ -149,6 +199,19 @@ describe('EmployeeEffects', () => {
     effects.createEmployee$.subscribe((action) => {
       expect(notificationServiceSpy.error).toHaveBeenCalled();
       expect(action.type).toBe(EmployeeActions.createEmployeeFailure.type);
+      done();
+    });
+  });
+
+  it('should use the create fallback message when the error has no message', (done) => {
+    actions$ = of(EmployeeActions.createEmployee({ employee: {} as EmployeeFormData }));
+    employeeServiceSpy.createEmployee.and.returnValue(throwError(() => ({})));
+
+    effects.createEmployee$.subscribe((action) => {
+      expect(notificationServiceSpy.error).toHaveBeenCalledWith('Unable to create employee.');
+      expect(action).toEqual(
+        EmployeeActions.createEmployeeFailure({ error: 'Unable to create employee.' })
+      );
       done();
     });
   });
@@ -164,6 +227,19 @@ describe('EmployeeEffects', () => {
     });
   });
 
+  it('should use the update fallback message when the error has no message', (done) => {
+    actions$ = of(EmployeeActions.updateEmployee({ id: '1', changes: {} }));
+    employeeServiceSpy.updateEmployee.and.returnValue(throwError(() => ({})));
+
+    effects.updateEmployee$.subscribe((action) => {
+      expect(notificationServiceSpy.error).toHaveBeenCalledWith('Unable to update employee.');
+      expect(action).toEqual(
+        EmployeeActions.updateEmployeeFailure({ error: 'Unable to update employee.' })
+      );
+      done();
+    });
+  });
+
   it('should emit deleteEmployeeFailure on delete error', (done) => {
     actions$ = of(EmployeeActions.deleteEmployee({ id: '1' }));
     employeeServiceSpy.deleteEmployee.and.returnValue(throwError(() => new Error('Delete failed')));
@@ -171,6 +247,19 @@ describe('EmployeeEffects', () => {
     effects.deleteEmployee$.subscribe((action) => {
       expect(notificationServiceSpy.error).toHaveBeenCalled();
       expect(action.type).toBe(EmployeeActions.deleteEmployeeFailure.type);
+      done();
+    });
+  });
+
+  it('should use the delete fallback message when the error has no message', (done) => {
+    actions$ = of(EmployeeActions.deleteEmployee({ id: '1' }));
+    employeeServiceSpy.deleteEmployee.and.returnValue(throwError(() => ({})));
+
+    effects.deleteEmployee$.subscribe((action) => {
+      expect(notificationServiceSpy.error).toHaveBeenCalledWith('Unable to delete employee.');
+      expect(action).toEqual(
+        EmployeeActions.deleteEmployeeFailure({ error: 'Unable to delete employee.' })
+      );
       done();
     });
   });

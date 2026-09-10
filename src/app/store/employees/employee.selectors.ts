@@ -3,7 +3,7 @@ import { EmployeeState, employeeAdapter } from './employee.models';
 
 export const selectEmployeeState = createFeatureSelector<EmployeeState>('employees');
 
-const { selectIds, selectEntities, selectAll, selectTotal } = employeeAdapter.getSelectors();
+const { selectEntities, selectAll, selectTotal } = employeeAdapter.getSelectors();
 
 export const selectAllEmployees = createSelector(
   selectEmployeeState,

@@ -1,6 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 import { provideMockActions } from '@ngrx/effects/testing';
-import { provideStore } from '@ngrx/store';
+import { provideStore, Store } from '@ngrx/store';
 import { Observable, of, throwError } from 'rxjs';
 import { CountryEffects } from './country.effects';
 import * as CountryActions from './country.actions';
@@ -12,6 +12,7 @@ describe('CountryEffects', () => {
   let actions$: Observable<any>;
   let effects: CountryEffects;
   let countryServiceSpy: jasmine.SpyObj<CountryService>;
+  let store: Store;
 
   const mockCountries: Country[] = [
     { id: '1', name: 'India' },
@@ -31,6 +32,7 @@ describe('CountryEffects', () => {
     });
 
     effects = TestBed.inject(CountryEffects);
+    store = TestBed.inject(Store);
   });
 
   it('should load countries and emit loadCountriesSuccess', (done) => {
@@ -51,6 +53,32 @@ describe('CountryEffects', () => {
 
     effects.loadCountries$.subscribe((action) => {
       expect(action.type).toBe(CountryActions.loadCountriesFailure.type);
+      done();
+    });
+  });
+
+  it('should not load countries again when they are already loaded', (done) => {
+    store.dispatch(CountryActions.loadCountriesSuccess({ countries: mockCountries }));
+    actions$ = of(CountryActions.loadCountries({ force: false }));
+    countryServiceSpy.getCountries.and.returnValue(of(mockCountries));
+
+    effects.loadCountries$.subscribe({
+      next: () => fail('No action should be emitted when countries are already loaded'),
+      complete: () => {
+        expect(countryServiceSpy.getCountries).not.toHaveBeenCalled();
+        done();
+      }
+    });
+  });
+
+  it('should use the fallback message when the country service error has no message', (done) => {
+    actions$ = of(CountryActions.loadCountries({ force: true }));
+    countryServiceSpy.getCountries.and.returnValue(throwError(() => ({})));
+
+    effects.loadCountries$.subscribe((action) => {
+      expect(action).toEqual(
+        CountryActions.loadCountriesFailure({ error: 'Unable to load countries.' })
+      );
       done();
     });
   });

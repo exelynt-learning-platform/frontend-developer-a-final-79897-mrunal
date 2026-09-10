@@ -28,6 +28,8 @@ describe('EmployeeSearchComponent', () => {
     spyOn(component.search, 'emit');
     component.searchControl.setValue('   ');
     component.onSearch();
+    component.searchControl.setValue(null);
+    component.onSearch();
 
     expect(component.search.emit).not.toHaveBeenCalled();
   });
@@ -47,5 +49,22 @@ describe('EmployeeSearchComponent', () => {
     component.onKeyDown(event);
 
     expect(component.onSearch).toHaveBeenCalled();
+  });
+
+  it('should synchronize the search control when searchId changes', () => {
+    component.searchId = '42';
+    expect(component.searchControl.value).toBe('42');
+
+    component.searchId = null;
+    expect(component.searchControl.value).toBe('');
+  });
+
+  it('should not rewrite the control when searchId matches its current value', () => {
+    component.searchControl.setValue('42');
+    const setValue = spyOn(component.searchControl, 'setValue');
+
+    component.searchId = '42';
+
+    expect(setValue).not.toHaveBeenCalled();
   });
 });

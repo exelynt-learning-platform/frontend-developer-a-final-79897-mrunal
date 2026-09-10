@@ -26,6 +26,15 @@ describe('CountryReducer', () => {
     expect(state3.loading).toBeTrue();
   });
 
+  it('should clear a previous error when loading already loaded countries without force', () => {
+    const loadedState = { ...initialCountryState, loaded: true, error: 'Previous error' };
+
+    const state = countryReducer(loadedState, CountryActions.loadCountries({ force: false }));
+
+    expect(state.loading).toBeFalse();
+    expect(state.error).toBeNull();
+  });
+
   it('should populate countries on loadCountriesSuccess', () => {
     const mockCountries: Country[] = [
       { id: '1', name: 'India' },

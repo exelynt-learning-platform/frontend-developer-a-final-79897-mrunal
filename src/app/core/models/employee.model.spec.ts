@@ -175,5 +175,27 @@ describe('EmployeeModel Mappings', () => {
       expect(employee.id).toBe('20');
       expect(employee.email).toBe('bob@test.com');
     });
+
+    it('should use empty defaults when optional DTO values are absent', () => {
+      const employee = mapEmployeeDtoToEmployee({
+        name: '',
+        mobile: '',
+        country: '',
+        state: '',
+        district: ''
+      });
+
+      expect(employee).toEqual({
+        id: '',
+        name: '',
+        email: '',
+        mobile: '',
+        country: '',
+        state: '',
+        district: '',
+        avatar: undefined,
+        createdAt: undefined
+      });
+    });
   });
 });

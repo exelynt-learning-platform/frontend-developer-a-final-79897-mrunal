@@ -3,7 +3,7 @@ import { CountryState, countryAdapter } from './country.models';
 
 export const selectCountryState = createFeatureSelector<CountryState>('countries');
 
-const { selectIds, selectEntities, selectAll, selectTotal } = countryAdapter.getSelectors();
+const { selectEntities, selectAll, selectTotal } = countryAdapter.getSelectors();
 
 export const selectAllCountries = createSelector(
   selectCountryState,

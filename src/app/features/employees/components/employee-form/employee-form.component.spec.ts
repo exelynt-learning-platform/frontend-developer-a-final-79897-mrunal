@@ -1,5 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
+import { FormControl, Validators } from '@angular/forms';
 import { EmployeeFormComponent } from './employee-form.component';
 import { Employee } from '../../../../core/models/employee.model';
 
@@ -173,6 +174,27 @@ describe('EmployeeFormComponent', () => {
       component.employeeForm.get(field.name)?.markAsTouched();
       expect(component.getFieldError(field.name)).toBe(field.expected);
     }
+  });
+
+  it('should return the generic required message for an unknown required field', () => {
+    component.employeeForm.addControl('other', new FormControl('', Validators.required));
+    expect(component.getFieldError('other')).toBe('This field is required.');
+  });
+
+  it('should normalize missing values when a disabled form is submitted', () => {
+    spyOn(component.formSubmit, 'emit');
+    component.employeeForm.disable();
+
+    component.onSubmit();
+
+    expect(component.formSubmit.emit).toHaveBeenCalledWith({
+      name: '',
+      email: '',
+      mobile: '',
+      country: '',
+      state: '',
+      district: ''
+    });
   });
 
   it('should return error message for whitespaceOnly, minlength, maxlength, and invalid formats', () => {

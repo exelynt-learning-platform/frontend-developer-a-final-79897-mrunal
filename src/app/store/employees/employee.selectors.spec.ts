@@ -8,6 +8,9 @@ import {
   selectSearchLoading,
   selectSearchError,
   selectActionInProgress,
+  selectActionError,
+  selectSelectedEmployeeId,
+  selectSelectedEmployee,
   selectEmployeeById
 } from './employee.selectors';
 import { initialEmployeeState, EmployeeState, employeeAdapter } from './employee.models';
@@ -43,6 +46,8 @@ describe('Employee Selectors', () => {
       searchLoading: false,
       searchError: null,
       actionInProgress: true
+      ,actionError: 'Action failed'
+      ,selectedEmployeeId: '2'
     })
   };
 
@@ -72,15 +77,42 @@ describe('Employee Selectors', () => {
     expect(selectSearchedEmployee(mockState)).toEqual(sampleEmployee1);
     expect(selectSearchLoading(mockState)).toBeFalse();
     expect(selectSearchError(mockState)).toBeNull();
+    expect(selectSelectedEmployeeId(mockState)).toBe('2');
   });
 
   it('should select actionInProgress', () => {
     expect(selectActionInProgress(mockState)).toBeTrue();
+    expect(selectActionError(mockState)).toBe('Action failed');
+    expect(selectSelectedEmployee(mockState)).toEqual(sampleEmployee2);
+  });
+
+  it('should return null when no employee is selected or the selected entity is missing', () => {
+    const noSelection = {
+      employees: { ...mockState.employees, selectedEmployeeId: null }
+    };
+    const missingSelection = {
+      employees: { ...mockState.employees, selectedEmployeeId: 'missing' }
+    };
+
+    expect(selectSelectedEmployee(noSelection)).toBeNull();
+    expect(selectSelectedEmployee(missingSelection)).toBeNull();
   });
 
   it('should select employee by ID using parameterized selector', () => {
     const selector = selectEmployeeById('2');
     const result = selector(mockState);
     expect(result?.name).toBe('Diya Sen');
+    expect(selectEmployeeById('missing')(mockState)).toBeNull();
+  });
+
+  it('should sort employees alphabetically when IDs are not numeric', () => {
+    const state = {
+      employees: employeeAdapter.setAll([
+        { ...sampleEmployee1, id: 'alpha' },
+        { ...sampleEmployee2, id: 'beta' }
+      ], initialEmployeeState)
+    };
+
+    expect(selectAllEmployees(state).map((employee) => employee.id)).toEqual(['alpha', 'beta']);
   });
 });
