@@ -95,4 +95,25 @@ describe('EmployeeFormDialogComponent', () => {
 
     expect(dialogRefSpy.close).toHaveBeenCalledWith(true);
   });
+
+  it('should not close dialog on submit failure and reset submitted state', () => {
+    component.onSubmit(validFormData);
+    actionsSubject.next(EmployeeActions.updateEmployeeFailure({ error: 'Server error' }));
+
+    expect(dialogRefSpy.close).not.toHaveBeenCalled();
+
+    // Stale/subsequent success should not close it because submitted state was reset
+    actionsSubject.next(EmployeeActions.updateEmployeeSuccess({ employee: mockEmployee }));
+    expect(dialogRefSpy.close).not.toHaveBeenCalled();
+  });
+
+  it('should reset submitted state when onCancel is invoked', () => {
+    component.onSubmit(validFormData);
+    component.onCancel();
+
+    expect(dialogRefSpy.close).toHaveBeenCalledWith(false);
+
+    actionsSubject.next(EmployeeActions.updateEmployeeSuccess({ employee: mockEmployee }));
+    expect(dialogRefSpy.close).not.toHaveBeenCalledWith(true);
+  });
 });

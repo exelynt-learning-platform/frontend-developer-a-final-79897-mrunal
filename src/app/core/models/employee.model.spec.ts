@@ -128,6 +128,16 @@ describe('EmployeeModel Mappings', () => {
       expect(result.avatar).toBe('avatar.png');
       expect(result.createdAt).toBe('2026-01-01');
     });
+
+    it('should preserve numeric id without trimming', () => {
+      const result = mapEmployeeToDto({ id: 123 } as unknown as Partial<EmployeeFormData>);
+      expect(result.id).toBe(123);
+    });
+
+    it('should trim and preserve extra string properties', () => {
+      const result = mapEmployeeToDto({ customField: '  custom  ' } as unknown as Partial<EmployeeFormData>);
+      expect((result as Record<string, unknown>)['customField']).toBe('custom');
+    });
   });
 
   describe('mapEmployeeDtoToEmployee', () => {

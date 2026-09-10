@@ -38,7 +38,7 @@ export class EmployeeSearchComponent {
 
   onSearch(): void {
     const value = (this.searchControl.value || '').trim();
-    if (value) {
+    if (value && this.searchControl.valid) {
       this.search.emit(value);
     }
   }

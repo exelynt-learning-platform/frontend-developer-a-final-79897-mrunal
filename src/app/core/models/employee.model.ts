@@ -46,21 +46,51 @@ export function mapEmployeeDtoToEmployee(dto: EmployeeDto): Employee {
   };
 }
 
-export function mapEmployeeToDto(employee: Partial<EmployeeFormData>): Partial<EmployeeDto> {
+export function mapEmployeeToDto(
+  employee: Partial<EmployeeFormData & EmployeeDto>
+): Partial<EmployeeDto> {
   if (!employee) {
     return {};
   }
 
-  const dto = Object.fromEntries(
-    Object.entries(employee)
-      .filter(([, value]) => value !== undefined)
-      .map(([key, value]) => [key, typeof value === 'string' ? value.trim() : value])
-  ) as Record<string, unknown>;
+  const dto: Partial<EmployeeDto> = {};
 
-  if (dto['email'] !== undefined) {
-    dto['emailId'] = dto['email'];
+  if (employee.id !== undefined) {
+    dto.id = typeof employee.id === 'string' ? employee.id.trim() : employee.id;
+  }
+  if (employee.name !== undefined) {
+    dto.name = employee.name.trim();
+  }
+  if (employee.email !== undefined) {
+    const email = employee.email.trim();
+    dto.email = email;
+    dto.emailId = email;
+  }
+  if (employee.mobile !== undefined) {
+    dto.mobile = employee.mobile.trim();
+  }
+  if (employee.country !== undefined) {
+    dto.country = employee.country.trim();
+  }
+  if (employee.state !== undefined) {
+    dto.state = employee.state.trim();
+  }
+  if (employee.district !== undefined) {
+    dto.district = employee.district.trim();
+  }
+  if (employee.avatar !== undefined) {
+    dto.avatar = employee.avatar.trim();
+  }
+  if (employee.createdAt !== undefined) {
+    dto.createdAt = employee.createdAt.trim();
   }
 
-  return dto as Partial<EmployeeDto>;
+  for (const [key, value] of Object.entries(employee)) {
+    if (value !== undefined && !(key in dto)) {
+      Object.assign(dto, { [key]: typeof value === 'string' ? value.trim() : value });
+    }
+  }
+
+  return dto;
 }
 

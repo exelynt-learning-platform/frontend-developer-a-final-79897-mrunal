@@ -20,6 +20,9 @@
     >
       <mat-icon>close</mat-icon>
     </button>
+    <mat-error *ngIf="searchControl.hasError('pattern')">
+      Please enter a valid numeric ID
+    </mat-error>
   </mat-form-field>
 
   <button
@@ -27,7 +30,7 @@
     color="primary"
     type="submit"
     class="search-btn"
-    [disabled]="loading || !searchControl.value"
+    [disabled]="loading || !searchControl.value || searchControl.invalid"
     aria-label="Submit search"
   >
     <mat-progress-spinner

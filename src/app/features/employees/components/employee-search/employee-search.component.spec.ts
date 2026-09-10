@@ -67,4 +67,14 @@ describe('EmployeeSearchComponent', () => {
 
     expect(setValue).not.toHaveBeenCalled();
   });
+
+  it('should invalidate control and not emit search when non-numeric input is provided', () => {
+    spyOn(component.search, 'emit');
+    component.searchControl.setValue('abc');
+    expect(component.searchControl.valid).toBeFalse();
+    expect(component.searchControl.hasError('pattern')).toBeTrue();
+
+    component.onSearch();
+    expect(component.search.emit).not.toHaveBeenCalled();
+  });
 });

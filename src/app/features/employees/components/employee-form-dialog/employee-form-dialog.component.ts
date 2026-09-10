@@ -9,8 +9,15 @@ import { Subject, filter, takeUntil } from 'rxjs';
 import { Employee, EmployeeFormData } from '../../../../core/models/employee.model';
 import { EmployeeFormComponent } from '../employee-form/employee-form.component';
 import { selectAllCountries, selectCountriesLoading } from '../../../../store/countries/country.selectors';
-import { createEmployee, createEmployeeSuccess, updateEmployee, updateEmployeeSuccess } from '../../../../store/employees/employee.actions';
 import { selectActionInProgress } from '../../../../store/employees/employee.selectors';
+import {
+  createEmployee,
+  createEmployeeSuccess,
+  createEmployeeFailure,
+  updateEmployee,
+  updateEmployeeSuccess,
+  updateEmployeeFailure
+} from '../../../../store/employees/employee.actions';
 
 export interface FormDialogData {
   employee?: Employee;
@@ -45,14 +52,28 @@ export class EmployeeFormDialogComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
+    this.submitted = false;
+
     this.actions$.pipe(
       ofType(createEmployeeSuccess, updateEmployeeSuccess),
       filter(() => this.submitted),
       takeUntil(this.destroy$)
-    ).subscribe(() => this.dialogRef.close(true));
+    ).subscribe(() => {
+      this.submitted = false;
+      this.dialogRef.close(true);
+    });
+
+    this.actions$.pipe(
+      ofType(createEmployeeFailure, updateEmployeeFailure),
+      filter(() => this.submitted),
+      takeUntil(this.destroy$)
+    ).subscribe(() => {
+      this.submitted = false;
+    });
   }
 
   ngOnDestroy(): void {
+    this.submitted = false;
     this.destroy$.next();
     this.destroy$.complete();
   }
@@ -76,6 +97,7 @@ export class EmployeeFormDialogComponent implements OnInit, OnDestroy {
   }
 
   onCancel(): void {
+    this.submitted = false;
     this.dialogRef.close(false);
   }
 }

@@ -7,7 +7,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { Store } from '@ngrx/store';
-import { Observable, BehaviorSubject } from 'rxjs';
+import { Observable } from 'rxjs';
 
 import { Employee } from '../../../../core/models/employee.model';
 import { EmployeeTableComponent } from '../../components/employee-table/employee-table.component';
@@ -32,7 +32,6 @@ import {
   selectSearchedEmployee,
   selectSearchLoading,
   selectSearchError,
-  selectActionInProgress,
   selectIsSearching
 } from '../../../../store/employees/employee.selectors';
 import {
@@ -69,7 +68,6 @@ export class EmployeePageComponent implements OnInit {
   searchedEmployee$ = this.store.select(selectSearchedEmployee);
   searchLoading$ = this.store.select(selectSearchLoading);
   searchError$ = this.store.select(selectSearchError);
-  actionInProgress$ = this.store.select(selectActionInProgress);
 
   totalCountries$ = this.store.select(selectCountryTotal);
   currentSearchTerm: string | null = null;
