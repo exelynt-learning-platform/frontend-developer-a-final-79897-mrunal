@@ -16,8 +16,10 @@ import { loadCountries } from '../../../../store/countries/country.actions';
 import {
   createEmployee,
   createEmployeeSuccess,
+  createEmployeeFailure,
   updateEmployee,
   updateEmployeeSuccess,
+  updateEmployeeFailure,
   loadEmployeeById
 } from '../../../../store/employees/employee.actions';
 import {
@@ -56,6 +58,7 @@ export class EmployeeAddEditPageComponent implements OnInit, OnDestroy {
 
   private destroy$ = new Subject<void>();
   private submitted = false;
+  private requestId: string | null = null;
 
   constructor(
     private route: ActivatedRoute,
@@ -87,33 +90,55 @@ export class EmployeeAddEditPageComponent implements OnInit, OnDestroy {
     this.actions$.pipe(
       ofType(createEmployeeSuccess, updateEmployeeSuccess),
       takeUntil(this.destroy$)
-    ).subscribe(() => {
-      if (this.submitted) {
+    ).subscribe((action) => {
+      if (this.submitted && action.requestId === this.requestId) {
+        this.submitted = false;
+        this.requestId = null;
         this.router.navigate(['/employees']);
+      }
+    });
+
+    this.actions$.pipe(
+      ofType(createEmployeeFailure, updateEmployeeFailure),
+      takeUntil(this.destroy$)
+    ).subscribe((action) => {
+      if (action.requestId === this.requestId) {
+        this.submitted = false;
+        this.requestId = null;
       }
     });
   }
 
   ngOnDestroy(): void {
+    this.submitted = false;
+    this.requestId = null;
     this.destroy$.next();
     this.destroy$.complete();
   }
 
   onSubmit(formData: EmployeeFormData): void {
+    if (this.submitted) {
+      return;
+    }
+
     this.submitted = true;
+    this.requestId = `${Date.now()}-${Math.random()}`;
     if (this.isEdit && this.employeeId) {
       this.store.dispatch(
         updateEmployee({
           id: this.employeeId,
-          changes: formData
+          changes: formData,
+          requestId: this.requestId
         })
       );
     } else {
-      this.store.dispatch(createEmployee({ employee: formData }));
+      this.store.dispatch(createEmployee({ employee: formData, requestId: this.requestId }));
     }
   }
 
   onCancel(): void {
+    this.submitted = false;
+    this.requestId = null;
     this.router.navigate(['/employees']);
   }
 

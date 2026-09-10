@@ -34,7 +34,11 @@ export class EmployeeSearchComponent {
   @Output() search = new EventEmitter<string>();
   @Output() clear = new EventEmitter<void>();
 
-  searchControl = new FormControl('', [Validators.pattern('^[0-9]+$')]);
+  searchControl = new FormControl('', [
+    Validators.minLength(1),
+    Validators.maxLength(20),
+    Validators.pattern('^[0-9]+$')
+  ]);
 
   onSearch(): void {
     const value = (this.searchControl.value || '').trim();

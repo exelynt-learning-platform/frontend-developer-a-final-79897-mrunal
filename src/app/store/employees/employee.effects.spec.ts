@@ -1,4 +1,5 @@
 import { TestBed } from '@angular/core/testing';
+import { HttpErrorResponse } from '@angular/common/http';
 import { provideMockActions } from '@ngrx/effects/testing';
 import { Observable, of, Subject, throwError } from 'rxjs';
 import { EmployeeEffects } from './employee.effects';
@@ -6,6 +7,7 @@ import * as EmployeeActions from './employee.actions';
 import { EmployeeService } from '../../core/services/employee.service';
 import { NotificationService } from '../../core/services/notification.service';
 import { Employee, EmployeeFormData } from '../../core/models/employee.model';
+import { AppApiError } from '../../core/interceptors/http-error.interceptor';
 
 describe('EmployeeEffects', () => {
   let actions$: Observable<any>;
@@ -179,7 +181,13 @@ describe('EmployeeEffects', () => {
 
   it('should return a not-found message for a 404 search error', (done) => {
     actions$ = of(EmployeeActions.loadEmployeeById({ id: '99' }));
-    employeeServiceSpy.getEmployeeById.and.returnValue(throwError(() => ({ status: 404 })));
+    employeeServiceSpy.getEmployeeById.and.returnValue(
+      throwError(() => new AppApiError(
+        'Requested resource was not found.',
+        404,
+        new HttpErrorResponse({ status: 404, statusText: 'Not Found' })
+      ))
+    );
 
     effects.loadEmployeeById$.subscribe((action) => {
       expect(action).toEqual(
@@ -237,6 +245,22 @@ describe('EmployeeEffects', () => {
       );
       done();
     });
+  });
+
+  it('should ignore a second create request while the first is in progress', () => {
+    const actionsSubject = new Subject<any>();
+    const createRequest = new Subject<Employee>();
+    actions$ = actionsSubject;
+    employeeServiceSpy.createEmployee.and.returnValue(createRequest);
+
+    effects.createEmployee$.subscribe();
+    actionsSubject.next(EmployeeActions.createEmployee({ employee: {} as EmployeeFormData }));
+    actionsSubject.next(EmployeeActions.createEmployee({ employee: {} as EmployeeFormData }));
+
+    expect(employeeServiceSpy.createEmployee).toHaveBeenCalledTimes(1);
+
+    createRequest.next(mockEmployee);
+    createRequest.complete();
   });
 
   it('should emit updateEmployeeFailure on update error', (done) => {

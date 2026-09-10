@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { of } from 'rxjs';
-import { map, mergeMap, switchMap, catchError } from 'rxjs/operators';
+import { exhaustMap, map, mergeMap, switchMap, catchError } from 'rxjs/operators';
 import { EmployeeService } from '../../core/services/employee.service';
 import { NotificationService } from '../../core/services/notification.service';
 import * as EmployeeActions from './employee.actions';
@@ -51,17 +51,21 @@ export class EmployeeEffects {
   createEmployee$ = createEffect(() =>
     this.actions$.pipe(
       ofType(EmployeeActions.createEmployee),
-      mergeMap(({ employee }) =>
+      exhaustMap(({ employee, requestId }) =>
         this.employeeService.createEmployee(employee).pipe(
           map((created) => {
             this.notificationService.success('Employee created successfully.');
-            return EmployeeActions.createEmployeeSuccess({ employee: created });
+            return EmployeeActions.createEmployeeSuccess({
+              employee: created,
+              ...(requestId ? { requestId } : {})
+            });
           }),
           catchError((error) => {
             this.notificationService.error(error.message || 'Unable to create employee.');
             return of(
               EmployeeActions.createEmployeeFailure({
-                error: error.message || 'Unable to create employee.'
+                error: error.message || 'Unable to create employee.',
+                ...(requestId ? { requestId } : {})
               })
             );
           })
@@ -73,17 +77,21 @@ export class EmployeeEffects {
   updateEmployee$ = createEffect(() =>
     this.actions$.pipe(
       ofType(EmployeeActions.updateEmployee),
-      mergeMap(({ id, changes }) =>
+      exhaustMap(({ id, changes, requestId }) =>
         this.employeeService.updateEmployee(id, changes).pipe(
           map((updated) => {
             this.notificationService.success('Employee updated successfully.');
-            return EmployeeActions.updateEmployeeSuccess({ employee: updated });
+            return EmployeeActions.updateEmployeeSuccess({
+              employee: updated,
+              ...(requestId ? { requestId } : {})
+            });
           }),
           catchError((error) => {
             this.notificationService.error(error.message || 'Unable to update employee.');
             return of(
               EmployeeActions.updateEmployeeFailure({
-                error: error.message || 'Unable to update employee.'
+                error: error.message || 'Unable to update employee.',
+                ...(requestId ? { requestId } : {})
               })
             );
           })
@@ -95,7 +103,7 @@ export class EmployeeEffects {
   deleteEmployee$ = createEffect(() =>
     this.actions$.pipe(
       ofType(EmployeeActions.deleteEmployee),
-      mergeMap(({ id }) =>
+      exhaustMap(({ id }) =>
         this.employeeService.deleteEmployee(id).pipe(
           map(() => {
             this.notificationService.success('Employee deleted successfully.');

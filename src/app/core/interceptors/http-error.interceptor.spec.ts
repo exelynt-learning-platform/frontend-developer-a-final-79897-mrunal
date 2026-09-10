@@ -1,7 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 import { HttpClient, provideHttpClient, withInterceptors } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
-import { httpErrorInterceptor } from './http-error.interceptor';
+import { AppApiError, httpErrorInterceptor } from './http-error.interceptor';
 
 describe('httpErrorInterceptor', () => {
   let http: HttpClient;
@@ -76,6 +76,9 @@ describe('httpErrorInterceptor', () => {
       next: () => fail('Should have failed'),
       error: (err) => {
         expect(err.message).toContain('Requested resource was not found');
+        expect(err).toEqual(jasmine.any(AppApiError));
+        expect(err.status).toBe(404);
+        expect(err.originalError.status).toBe(404);
         done();
       }
     });

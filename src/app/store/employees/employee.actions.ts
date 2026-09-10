@@ -33,28 +33,28 @@ export const selectEmployee = createAction(
 
 export const createEmployee = createAction(
   '[Employee] Create Employee',
-  props<{ employee: EmployeeFormData }>()
+  props<{ employee: EmployeeFormData; requestId?: string }>()
 );
 export const createEmployeeSuccess = createAction(
   '[Employee] Create Employee Success',
-  props<{ employee: Employee }>()
+  props<{ employee: Employee; requestId?: string }>()
 );
 export const createEmployeeFailure = createAction(
   '[Employee] Create Employee Failure',
-  props<{ error: string }>()
+  props<{ error: string; requestId?: string }>()
 );
 
 export const updateEmployee = createAction(
   '[Employee] Update Employee',
-  props<{ id: string; changes: Partial<EmployeeFormData> }>()
+  props<{ id: string; changes: Partial<EmployeeFormData>; requestId?: string }>()
 );
 export const updateEmployeeSuccess = createAction(
   '[Employee] Update Employee Success',
-  props<{ employee: Employee }>()
+  props<{ employee: Employee; requestId?: string }>()
 );
 export const updateEmployeeFailure = createAction(
   '[Employee] Update Employee Failure',
-  props<{ error: string }>()
+  props<{ error: string; requestId?: string }>()
 );
 
 export const deleteEmployee = createAction(

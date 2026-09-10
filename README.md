@@ -181,7 +181,7 @@ export const environment = {
 
 ## ?? Testing Suite
 
-The project includes **169 automated unit tests** covering business-critical paths:
+The project includes **174 automated unit tests** covering business-critical paths:
 
 - **EmployeeService**: Mock HTTP testing for GET, GET by ID, POST, PUT, DELETE, and 500 status propagation.
 - **CountryService**: Mock HTTP testing for country list and error fallback.
@@ -198,7 +198,7 @@ The project includes **169 automated unit tests** covering business-critical pat
 ```bash
 npm test -- --watch=false --browsers=ChromeHeadless
 ```
-**Result**: 169 SUCCESS (100% passing)
+**Result**: 174 SUCCESS (100% passing)
 
 ---
 

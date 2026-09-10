@@ -62,19 +62,21 @@ export class EmployeeFormComponent implements OnInit, OnChanges {
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes['employee'] && this.employeeForm) {
-      if (this.employee) {
-        this.employeeForm.patchValue({
+    if (!changes['employee'] || !this.employeeForm) {
+      return;
+    }
+
+    if (this.employee) {
+      this.employeeForm.patchValue({
           name: this.employee.name,
           email: this.employee.email,
           mobile: this.employee.mobile,
           country: this.employee.country,
           state: this.employee.state,
           district: this.employee.district
-        });
-      } else {
-        this.employeeForm.reset();
-      }
+      });
+    } else {
+      this.employeeForm?.reset();
     }
   }
 

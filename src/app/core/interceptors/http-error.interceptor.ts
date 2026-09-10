@@ -9,6 +9,17 @@ const HTTP_ERROR_MESSAGES: Record<number, string> = {
   404: 'Requested resource was not found.'
 };
 
+export class AppApiError extends Error {
+  constructor(
+    message: string,
+    readonly status: number,
+    readonly originalError: HttpErrorResponse
+  ) {
+    super(message);
+    this.name = 'AppApiError';
+  }
+}
+
 export const httpErrorInterceptor: HttpInterceptorFn = (req, next) => {
   return next(req).pipe(
     catchError((error: HttpErrorResponse) => {
@@ -22,11 +33,7 @@ export const httpErrorInterceptor: HttpInterceptorFn = (req, next) => {
         }
       }
 
-      const enhancedError = new Error(userFriendlyMessage);
-      (enhancedError as any).status = error.status;
-      (enhancedError as any).originalError = error;
-
-      return throwError(() => enhancedError);
+      return throwError(() => new AppApiError(userFriendlyMessage, error.status, error));
     })
   );
 };

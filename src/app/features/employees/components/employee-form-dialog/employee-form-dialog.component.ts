@@ -43,6 +43,7 @@ export class EmployeeFormDialogComponent implements OnInit, OnDestroy {
 
   private destroy$ = new Subject<void>();
   private submitted = false;
+  private requestId: string | null = null;
 
   constructor(
     public dialogRef: MatDialogRef<EmployeeFormDialogComponent>,
@@ -56,16 +57,17 @@ export class EmployeeFormDialogComponent implements OnInit, OnDestroy {
 
     this.actions$.pipe(
       ofType(createEmployeeSuccess, updateEmployeeSuccess),
-      filter(() => this.submitted),
+      filter((action) => this.submitted && action.requestId === this.requestId),
       takeUntil(this.destroy$)
     ).subscribe(() => {
       this.submitted = false;
+      this.requestId = null;
       this.dialogRef.close(true);
     });
 
     this.actions$.pipe(
       ofType(createEmployeeFailure, updateEmployeeFailure),
-      filter(() => this.submitted),
+      filter((action) => this.submitted && action.requestId === this.requestId),
       takeUntil(this.destroy$)
     ).subscribe(() => {
       this.submitted = false;
@@ -74,6 +76,7 @@ export class EmployeeFormDialogComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.submitted = false;
+    this.requestId = null;
     this.destroy$.next();
     this.destroy$.complete();
   }
@@ -83,21 +86,28 @@ export class EmployeeFormDialogComponent implements OnInit, OnDestroy {
   }
 
   onSubmit(formData: EmployeeFormData): void {
+    if (this.submitted) {
+      return;
+    }
+
     this.submitted = true;
+    this.requestId = `${Date.now()}-${Math.random()}`;
     if (this.isEdit && this.data.employee) {
       this.store.dispatch(
         updateEmployee({
           id: this.data.employee.id,
-          changes: formData
+          changes: formData,
+          requestId: this.requestId
         })
       );
     } else {
-      this.store.dispatch(createEmployee({ employee: formData }));
+      this.store.dispatch(createEmployee({ employee: formData, requestId: this.requestId }));
     }
   }
 
   onCancel(): void {
     this.submitted = false;
+    this.requestId = null;
     this.dialogRef.close(false);
   }
 }

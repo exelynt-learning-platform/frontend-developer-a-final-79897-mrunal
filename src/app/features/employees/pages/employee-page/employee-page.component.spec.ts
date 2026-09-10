@@ -49,6 +49,10 @@ describe('EmployeePageComponent', () => {
     expect(component).toBeTruthy();
   });
 
+  it('should render summary cards when the employee total is zero', () => {
+    expect(fixture.nativeElement.querySelector('.summary-cards-row')).toBeTruthy();
+  });
+
   it('should dispatch search action and update isSearching$ when onSearch is invoked', (done) => {
     component.onSearch('10');
     expect(component.currentSearchTerm).toBe('10');

@@ -17,6 +17,7 @@ describe('EmployeeAddEditPageComponent', () => {
   let store: Store;
   let actions$: Subject<Action>;
   let routeParamMap: jasmine.SpyObj<ParamMap>;
+  let dispatchSpy: jasmine.Spy;
 
   const validFormData: EmployeeFormData = {
     name: 'Rohit Sharma',
@@ -55,7 +56,7 @@ describe('EmployeeAddEditPageComponent', () => {
     router = TestBed.inject(Router);
     store = TestBed.inject(Store);
     spyOn(router, 'navigate');
-    spyOn(store, 'dispatch').and.callThrough();
+    dispatchSpy = spyOn(store, 'dispatch').and.callThrough();
 
     fixture = TestBed.createComponent(EmployeeAddEditPageComponent);
     component = fixture.componentInstance;
@@ -69,8 +70,9 @@ describe('EmployeeAddEditPageComponent', () => {
 
   it('should dispatch createEmployee action when submitting in add mode', () => {
     component.onSubmit(validFormData);
+    const requestId = dispatchSpy.calls.mostRecent().args[0].requestId;
     expect(store.dispatch).toHaveBeenCalledWith(
-      EmployeeActions.createEmployee({ employee: validFormData })
+      EmployeeActions.createEmployee({ employee: validFormData, requestId })
     );
   });
 
@@ -83,10 +85,12 @@ describe('EmployeeAddEditPageComponent', () => {
     component.isEdit = true;
     component.employeeId = '42';
     component.onSubmit(validFormData);
+    const requestId = dispatchSpy.calls.mostRecent().args[0].requestId;
     expect(store.dispatch).toHaveBeenCalledWith(
       EmployeeActions.updateEmployee({
         id: '42',
-        changes: validFormData
+        changes: validFormData,
+        requestId
       })
     );
   });
@@ -97,9 +101,11 @@ describe('EmployeeAddEditPageComponent', () => {
 
   it('should navigate to /employees when actions$ emits success and form was submitted', () => {
     component.onSubmit(validFormData);
+    const requestId = dispatchSpy.calls.mostRecent().args[0].requestId;
     actions$.next(
       EmployeeActions.createEmployeeSuccess({
-        employee: { id: '1', ...validFormData }
+        employee: { id: '1', ...validFormData },
+        requestId
       })
     );
     expect(router.navigate).toHaveBeenCalledWith(['/employees']);
@@ -118,6 +124,19 @@ describe('EmployeeAddEditPageComponent', () => {
     store.dispatch(EmployeeActions.loadEmployeeByIdSuccess({ employee }));
 
     expect(component.employee).toEqual(employee);
+  });
+
+  it('should reset submission state after a matching failure', () => {
+    component.onSubmit(validFormData);
+    const requestId = dispatchSpy.calls.mostRecent().args[0].requestId;
+
+    actions$.next(EmployeeActions.createEmployeeFailure({ error: 'Server error', requestId }));
+    actions$.next(EmployeeActions.createEmployeeSuccess({
+      employee: { id: '1', ...validFormData },
+      requestId
+    }));
+
+    expect(router.navigate).not.toHaveBeenCalled();
   });
 
   it('should dispatch loadEmployeeById when onRetry is invoked in edit mode', () => {

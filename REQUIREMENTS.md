@@ -15,7 +15,7 @@ Automated statuses below refer to executable tests or builds. Visual, responsive
 | **7** | **Add Employee** | Reactive form with strict validations, dialog modal and dedicated route | `src/app/features/employees/components/employee-form/`, `employee-form-dialog/` | `src/app/features/employees/components/employee-form/employee-form.component.spec.ts` | ? Verified |
 | **8** | **Edit Employee** | Form pre-population, validation, PUT request, immediate entity update | `src/app/features/employees/components/employee-form/`, `pages/employee-add-edit-page/` | `src/app/features/employees/components/employee-form/employee-form.component.spec.ts` | ? Verified |
 | **9** | **Delete Employee** | Material confirmation dialog with cancel/confirm, DELETE call, state removal | `src/app/shared/components/employee-delete-dialog/` | `src/app/shared/components/employee-delete-dialog/employee-delete-dialog.component.spec.ts` | ? Verified |
-| **10** | **Country State & Caching** | NgRx store with entity adapter and cache filter to prevent duplicate requests | `src/app/store/countries/` | Handled via store selectors & effects | ? Verified |
+| **10** | **Country State & Caching** | NgRx store with entity adapter and cache filter to prevent duplicate requests | `src/app/store/countries/` | Cache guard and effect tests; request behavior review | Automated + manual review |
 | **11** | **Form Validation** | Required, regex email, 7-15 digit mobile, no whitespace, min/max length | `src/app/core/validators/custom-validators.ts` | `src/app/features/employees/components/employee-form/employee-form.component.spec.ts` | ? Verified |
 | **12** | **NgRx Store** | Normalized state with actions, reducers, and initial state | `src/app/store/employees/employee.actions.ts`, `employee.reducer.ts` | `src/app/store/employees/employee.reducer.spec.ts` | ? Verified |
 | **13** | **NgRx Entity** | `createEntityAdapter<Employee>()` for $O(1)$ CRUD updates | `src/app/store/employees/employee.models.ts` | `src/app/store/employees/employee.reducer.spec.ts` | ? Verified |
@@ -23,7 +23,7 @@ Automated statuses below refer to executable tests or builds. Visual, responsive
 | **15** | **NgRx Selectors** | Memoized selectors for entities, counts, loading, and error states | `src/app/store/employees/employee.selectors.ts` | `src/app/store/employees/employee.selectors.spec.ts` | ? Verified |
 | **16** | **Smart & Dumb Architecture** | Smart container components vs pure presentational components with inputs/outputs | `src/app/features/employees/pages/` vs `components/` | Isolated unit tests per component level | ? Verified |
 | **17** | **Layout & Navigation** | Header with live count, collapsible Sidenav drawer, and active indicators | `src/app/layout/header/`, `src/app/layout/sidebar/`, `src/app/app.component.*` | `src/app/app.component.spec.ts` | ? Verified |
-| **18** | **Dashboard Overview** | Executive summary cards, country presence, and recently added entries | `src/app/features/dashboard/pages/dashboard-page/` | Component compilation & store integration | ? Verified |
+| **18** | **Dashboard Overview** | Executive summary cards, country presence, and recently added entries | `src/app/features/dashboard/pages/dashboard-page/` | Store stream/component tests; visual layout review | Automated + manual review |
 | **19** | **Responsive Design** | Desktop table transforms into high-fidelity card list below 768px; fluid down to 375px | `employee-table.component.scss`, `app.component.scss` | Breakpoint review across 1920px - 375px | Manual review |
 | **20** | **Accessibility (a11y)** | Semantic HTML, `aria-label`, `role="alert"`, focus outlines, keyboard Enter search | All component templates | Template audit | Manual review |
 | **21** | **Centralized Error Handling** | HTTP Interceptor with status-based user-friendly messages (400, 401, 403, 404, 500) | `src/app/core/interceptors/http-error.interceptor.ts` | Injected across HTTP pipelines | ? Verified |
@@ -31,7 +31,7 @@ Automated statuses below refer to executable tests or builds. Visual, responsive
 | **23** | **Notifications** | Angular Material Snackbar with custom success, info, and error styling | `src/app/core/services/notification.service.ts` | Verified in `employee.effects.spec.ts` | ? Verified |
 | **24** | **Performance Optimizations** | `ChangeDetectionStrategy.OnPush`, `trackBy: trackByEmployeeId`, `async` pipe | All feature components | Source review and build inspection | Manual review |
 | **25** | **Routing** | `/dashboard`, `/employees`, `/employees/add`, `/employees/edit/:id`, wildcard redirect | `src/app/app.routes.ts` | Route compilation & lazy chunk bundling | ? Verified |
-| **26** | **Unit Testing** | 169 comprehensive unit tests with mocks, zero fake assertions | `src/**/*.spec.ts` | **169 passed / 0 failed** via Karma ChromeHeadless | Automated |
+| **26** | **Unit Testing** | 174 comprehensive unit tests with mocks, zero fake assertions | `src/**/*.spec.ts` | **174 passed / 0 failed** via Karma ChromeHeadless | Automated |
 | **27** | **Production Build** | Zero TypeScript errors, AOT compilation, lazy chunks, budget compliance | `angular.json` | Build exit code 0 | Automated |
 
 ---
@@ -42,7 +42,7 @@ Automated statuses below refer to executable tests or builds. Visual, responsive
    ```bash
    npm test -- --watch=false --browsers=ChromeHeadless
    ```
-   *Expectation*: `TOTAL: 169 SUCCESS` with 0 errors.
+   *Expectation*: `TOTAL: 174 SUCCESS` with 0 errors.
 
 2. **Verify Production Build**:
    ```bash

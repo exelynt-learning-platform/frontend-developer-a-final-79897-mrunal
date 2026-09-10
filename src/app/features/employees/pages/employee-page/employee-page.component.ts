@@ -7,7 +7,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { Store } from '@ngrx/store';
-import { Observable } from 'rxjs';
+import { Observable, combineLatest } from 'rxjs';
 
 import { Employee } from '../../../../core/models/employee.model';
 import { EmployeeTableComponent } from '../../components/employee-table/employee-table.component';
@@ -74,6 +74,18 @@ export class EmployeePageComponent implements OnInit {
 
   // Single source of truth for search active state
   isSearching$ = this.store.select(selectIsSearching);
+
+  vm$ = combineLatest({
+    employees: this.employees$,
+    totalEmployees: this.totalEmployees$,
+    totalCountries: this.totalCountries$,
+    loading: this.loading$,
+    error: this.error$,
+    searchedEmployee: this.searchedEmployee$,
+    searchLoading: this.searchLoading$,
+    searchError: this.searchError$,
+    isSearching: this.isSearching$
+  });
 
   constructor(
     private store: Store,

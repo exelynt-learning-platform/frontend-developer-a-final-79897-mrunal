@@ -14,6 +14,7 @@ describe('EmployeeFormDialogComponent', () => {
   let dialogRefSpy: jasmine.SpyObj<MatDialogRef<EmployeeFormDialogComponent>>;
   let store: Store;
   let actionsSubject: ScannedActionsSubject;
+  let dispatchSpy: jasmine.Spy;
 
   const mockEmployee: Employee = {
     id: '7',
@@ -51,7 +52,7 @@ describe('EmployeeFormDialogComponent', () => {
 
     store = TestBed.inject(Store);
     actionsSubject = TestBed.inject(ScannedActionsSubject);
-    spyOn(store, 'dispatch');
+    dispatchSpy = spyOn(store, 'dispatch');
 
     fixture = TestBed.createComponent(EmployeeFormDialogComponent);
     component = fixture.componentInstance;
@@ -64,8 +65,9 @@ describe('EmployeeFormDialogComponent', () => {
 
   it('should dispatch updateEmployee action on submit in edit mode', () => {
     component.onSubmit(validFormData);
+    const requestId = dispatchSpy.calls.mostRecent().args[0].requestId;
     expect(store.dispatch).toHaveBeenCalledWith(
-      EmployeeActions.updateEmployee({ id: '7', changes: validFormData })
+      EmployeeActions.updateEmployee({ id: '7', changes: validFormData, requestId })
     );
   });
 
@@ -77,8 +79,9 @@ describe('EmployeeFormDialogComponent', () => {
   it('should dispatch createEmployee action on submit in add mode', () => {
     component.data = {};
     component.onSubmit(validFormData);
+    const requestId = dispatchSpy.calls.mostRecent().args[0].requestId;
     expect(store.dispatch).toHaveBeenCalledWith(
-      EmployeeActions.createEmployee({ employee: validFormData })
+      EmployeeActions.createEmployee({ employee: validFormData, requestId })
     );
   });
 
@@ -91,14 +94,30 @@ describe('EmployeeFormDialogComponent', () => {
     expect(dialogRefSpy.close).not.toHaveBeenCalled();
 
     component.onSubmit(validFormData);
-    actionsSubject.next(EmployeeActions.updateEmployeeSuccess({ employee: mockEmployee }));
+    const requestId = dispatchSpy.calls.mostRecent().args[0].requestId;
+    actionsSubject.next(EmployeeActions.updateEmployeeSuccess({ employee: mockEmployee, requestId }));
 
+    expect(dialogRefSpy.close).toHaveBeenCalledWith(true);
+  });
+
+  it('should ignore a success action belonging to another submission', () => {
+    component.onSubmit(validFormData);
+    const requestId = dispatchSpy.calls.mostRecent().args[0].requestId;
+
+    actionsSubject.next(EmployeeActions.updateEmployeeSuccess({
+      employee: mockEmployee,
+      requestId: 'another-request'
+    }));
+    expect(dialogRefSpy.close).not.toHaveBeenCalled();
+
+    actionsSubject.next(EmployeeActions.updateEmployeeSuccess({ employee: mockEmployee, requestId }));
     expect(dialogRefSpy.close).toHaveBeenCalledWith(true);
   });
 
   it('should not close dialog on submit failure and reset submitted state', () => {
     component.onSubmit(validFormData);
-    actionsSubject.next(EmployeeActions.updateEmployeeFailure({ error: 'Server error' }));
+    const requestId = dispatchSpy.calls.mostRecent().args[0].requestId;
+    actionsSubject.next(EmployeeActions.updateEmployeeFailure({ error: 'Server error', requestId }));
 
     expect(dialogRefSpy.close).not.toHaveBeenCalled();
 

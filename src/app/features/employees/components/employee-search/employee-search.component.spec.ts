@@ -77,4 +77,11 @@ describe('EmployeeSearchComponent', () => {
     component.onSearch();
     expect(component.search.emit).not.toHaveBeenCalled();
   });
+
+  it('should reject IDs longer than 20 digits', () => {
+    component.searchControl.setValue('1'.repeat(21));
+
+    expect(component.searchControl.hasError('maxlength')).toBeTrue();
+    expect(component.searchControl.valid).toBeFalse();
+  });
 });
