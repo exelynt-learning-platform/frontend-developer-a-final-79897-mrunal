@@ -1,0 +1,18 @@
+<div class="error-state-card" role="alert">
+  <div class="error-icon-box" aria-hidden="true">
+    <mat-icon>error_outline</mat-icon>
+  </div>
+  <div class="error-content">
+    <h4 class="error-title">{{ title }}</h4>
+    <p class="error-message">{{ message }}</p>
+  </div>
+  <button
+    mat-stroked-button
+    color="warn"
+    class="retry-btn"
+    (click)="onRetry()"
+  >
+    <mat-icon>refresh</mat-icon>
+    {{ retryLabel }}
+  </button>
+</div>

@@ -1,0 +1,28 @@
+<div class="dialog-header">
+  <div class="header-icon" [ngClass]="isEdit ? 'edit-icon' : 'add-icon'">
+    <mat-icon>{{ isEdit ? 'edit_note' : 'person_add' }}</mat-icon>
+  </div>
+  <div class="header-text">
+    <h2 mat-dialog-title class="title">
+      {{ isEdit ? 'Edit Employee Record' : 'Add New Employee' }}
+    </h2>
+    <p class="subtitle">
+      {{ isEdit ? 'Update employee contact and assignment details' : 'Fill in the information to register a new employee' }}
+    </p>
+  </div>
+  <button mat-icon-button class="close-btn" aria-label="Close dialog" (click)="onCancel()">
+    <mat-icon>close</mat-icon>
+  </button>
+</div>
+
+<mat-dialog-content class="dialog-body">
+  <app-employee-form
+    [employee]="data.employee || null"
+    [countries]="(countries$ | async) || []"
+    [countriesLoading]="(countriesLoading$ | async) || false"
+    [submitting]="(submitting$ | async) || false"
+    [submitButtonLabel]="isEdit ? 'Save Changes' : 'Create Employee'"
+    (formSubmit)="onSubmit($event)"
+    (formCancel)="onCancel()"
+  ></app-employee-form>
+</mat-dialog-content>

@@ -1,0 +1,52 @@
+<nav class="ems-sidebar" aria-label="Main Navigation">
+  <div class="sidebar-header">
+    <span class="nav-section-title">NAVIGATION</span>
+  </div>
+
+  <mat-nav-list class="nav-list">
+    <a
+      mat-list-item
+      routerLink="/dashboard"
+      routerLinkActive="active-nav-link"
+      (click)="onItemClick()"
+      class="nav-link-item"
+    >
+      <mat-icon matListItemIcon class="nav-icon">dashboard</mat-icon>
+      <span matListItemTitle class="nav-title">Dashboard</span>
+    </a>
+
+    <a
+      mat-list-item
+      routerLink="/employees"
+      routerLinkActive="active-nav-link"
+      [routerLinkActiveOptions]="{ exact: true }"
+      (click)="onItemClick()"
+      class="nav-link-item"
+    >
+      <mat-icon matListItemIcon class="nav-icon">people</mat-icon>
+      <span matListItemTitle class="nav-title">Employees</span>
+      <span matListItemMeta class="nav-badge">{{ (totalEmployees$ | async) ?? 0 }}</span>
+    </a>
+
+    <a
+      mat-list-item
+      routerLink="/employees/add"
+      routerLinkActive="active-nav-link"
+      (click)="onItemClick()"
+      class="nav-link-item"
+    >
+      <mat-icon matListItemIcon class="nav-icon">person_add</mat-icon>
+      <span matListItemTitle class="nav-title">Add Employee</span>
+    </a>
+  </mat-nav-list>
+
+  <div class="sidebar-footer">
+    <div class="app-version-box">
+      <mat-icon class="version-icon">verified</mat-icon>
+      <div class="version-info">
+        <span class="app-label">EMS Production</span>
+        <span class="version-number">v1.0.0</span>
+      </div>
+    </div>
+  </div>
+</nav>

@@ -1,0 +1,118 @@
+@use '../../../../../styles/employee-badges' as employee-badges;
+
+.table-responsive-wrapper {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.desktop-table {
+  width: 100%;
+  background-color: #ffffff;
+  border-collapse: separate;
+  border-spacing: 0;
+
+  th {
+    background-color: #f8fafc;
+    color: #475569;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 1rem 1.25rem;
+    border-bottom: 1px solid #e2e8f0;
+  }
+
+  td {
+    padding: 0.85rem 1.25rem;
+    color: #334155;
+    font-size: 0.9rem;
+    border-bottom: 1px solid #f1f5f9;
+  }
+
+  .table-row {
+    transition: background-color 0.15s ease-in-out;
+
+    &:hover {
+      background-color: #f8fafc;
+    }
+  }
+}
+
+.id-badge {
+  @include employee-badges.id-badge;
+}
+
+.name-cell {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.avatar-circle {
+  @include employee-badges.avatar-circle;
+}
+
+.full-name {
+  font-weight: 600;
+  color: #0f172a;
+}
+
+.email-text {
+  max-width: 200px;
+  display: inline-block;
+  color: #475569;
+}
+
+.mobile-text {
+  color: #475569;
+}
+
+.country-pill {
+  @include employee-badges.country-pill;
+}
+
+.location-text {
+  color: #64748b;
+  font-size: 0.85rem;
+
+  .divider {
+    color: #cbd5e1;
+    margin: 0 0.25rem;
+  }
+}
+
+.action-buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.25rem;
+}
+
+.edit-action-btn:hover {
+  background-color: #e0e7ff;
+}
+
+.delete-action-btn:hover {
+  background-color: #fee2e2;
+}
+
+.text-end {
+  text-align: right;
+}
+
+// Mobile Card List Styling
+.mobile-card-list {
+  display: none;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 0.5rem;
+}
+
+// Media queries for mobile transformation (Requirement 15)
+@media (max-width: 768px) {
+  .desktop-table {
+    display: none;
+  }
+  .mobile-card-list {
+    display: flex;
+  }
+}

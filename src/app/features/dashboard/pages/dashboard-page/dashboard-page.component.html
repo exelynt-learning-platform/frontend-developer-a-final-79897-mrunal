@@ -1,0 +1,121 @@
+<div class="dashboard-container">
+  <!-- Welcome Banner -->
+  <div class="welcome-banner">
+    <div class="banner-texts">
+      <h1 class="greeting">Employee Management Dashboard</h1>
+      <p class="greeting-sub">Overview of your workforce statistics, coverage, and recent team additions.</p>
+    </div>
+    <div class="banner-actions">
+      <a mat-flat-button color="primary" routerLink="/employees/add" class="cta-btn">
+        <mat-icon>person_add</mat-icon>
+        <span>Add Employee</span>
+      </a>
+      <a mat-stroked-button routerLink="/employees" class="view-btn">
+        <mat-icon>group</mat-icon>
+        <span>Manage All Records</span>
+      </a>
+    </div>
+  </div>
+
+  <!-- Key Metrics Cards -->
+  <div class="metrics-grid">
+    <mat-card class="metric-card">
+      <div class="metric-icon-box bg-indigo">
+        <mat-icon>groups</mat-icon>
+      </div>
+      <div class="metric-meta">
+        <span class="label">Total Employees</span>
+        <h2 class="value">{{ (totalEmployees$ | async) ?? 0 }}</h2>
+        <span class="subtext">Registered across the system</span>
+      </div>
+    </mat-card>
+
+    <mat-card class="metric-card">
+      <div class="metric-icon-box bg-emerald">
+        <mat-icon>public</mat-icon>
+      </div>
+      <div class="metric-meta">
+        <span class="label">Countries Represented</span>
+        <h2 class="value">{{ (totalCountries$ | async) ?? 0 }}</h2>
+        <span class="subtext">Global talent distribution</span>
+      </div>
+    </mat-card>
+
+    <mat-card class="metric-card">
+      <div class="metric-icon-box bg-blue">
+        <mat-icon>verified_user</mat-icon>
+      </div>
+      <div class="metric-meta">
+        <span class="label">Active Work Status</span>
+        <h2 class="value">100%</h2>
+        <span class="subtext">All records verified & active</span>
+      </div>
+    </mat-card>
+  </div>
+
+  <!-- Two Column Layout: Recent Employees & Countries -->
+  <div class="dashboard-split">
+    <!-- Recently Added Section -->
+    <mat-card class="dashboard-panel">
+      <div class="panel-header">
+        <div class="panel-title-box">
+          <mat-icon class="panel-icon">history</mat-icon>
+          <h3 class="panel-title">Recently Added Employees</h3>
+        </div>
+        <a mat-button color="primary" routerLink="/employees" class="see-all-link">
+          View all
+          <mat-icon>arrow_forward</mat-icon>
+        </a>
+      </div>
+
+      <app-loading-state
+        *ngIf="(employeesLoading$ | async) && ((recentEmployees$ | async)?.length === 0)"
+        mode="spinner"
+        message="Loading recent entries..."
+      ></app-loading-state>
+
+      <div class="recent-list" *ngIf="((recentEmployees$ | async)?.length || 0) > 0">
+        <div *ngFor="let emp of recentEmployees$ | async" class="recent-item">
+          <div class="emp-avatar">
+            {{ emp.name.charAt(0).toUpperCase() }}
+          </div>
+          <div class="emp-details">
+            <h4 class="name">{{ emp.name }}</h4>
+            <span class="meta">{{ emp.email }} &bull; {{ emp.mobile }}</span>
+          </div>
+          <div class="emp-badge">
+            <span class="country-tag">{{ emp.country }}</span>
+            <span class="id-tag">#{{ emp.id }}</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel-empty" *ngIf="!(employeesLoading$ | async) && ((recentEmployees$ | async)?.length === 0)">
+        <p>No employees recorded yet.</p>
+      </div>
+    </mat-card>
+
+    <!-- Global Operations Countries -->
+    <mat-card class="dashboard-panel">
+      <div class="panel-header">
+        <div class="panel-title-box">
+          <mat-icon class="panel-icon">flag</mat-icon>
+          <h3 class="panel-title">Supported Countries</h3>
+        </div>
+      </div>
+
+      <app-loading-state
+        *ngIf="(countriesLoading$ | async) && ((countries$ | async)?.length === 0)"
+        mode="spinner"
+        message="Loading countries..."
+      ></app-loading-state>
+
+      <div class="country-chips-container" *ngIf="((countries$ | async)?.length || 0) > 0">
+        <div *ngFor="let country of countries$ | async" class="country-chip">
+          <mat-icon class="flag-icon">public</mat-icon>
+          <span>{{ country.name }}</span>
+        </div>
+      </div>
+    </mat-card>
+  </div>
+</div>

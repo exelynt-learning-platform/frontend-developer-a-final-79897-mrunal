@@ -1,0 +1,26 @@
+.app-layout {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
+  background-color: var(--bg-app);
+}
+
+.sidenav-container {
+  flex: 1;
+  height: calc(100vh - 64px);
+}
+
+.app-sidenav {
+  border-right: 1px solid #1e293b;
+  box-shadow: none;
+}
+
+.main-content-container {
+  overflow-y: auto;
+  background-color: var(--bg-app);
+}
+
+.page-main-outlet {
+  min-height: 100%;
+}

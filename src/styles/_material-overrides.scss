@@ -1,0 +1,33 @@
+.mat-mdc-card {
+  border-radius: var(--radius-lg) !important;
+  box-shadow: var(--card-shadow) !important;
+  border: 1px solid var(--border-color);
+  background-color: var(--bg-surface) !important;
+  transition: box-shadow 0.2s ease-in-out, border-color 0.2s ease-in-out;
+}
+
+.mat-mdc-dialog-container .mdc-dialog__surface {
+  border-radius: var(--radius-xl) !important;
+  box-shadow: var(--modal-shadow) !important;
+  padding: 0 !important;
+}
+
+.mat-mdc-snack-bar-container {
+  &.ems-snackbar-success {
+    --mdc-snackbar-container-color: #065f46;
+    --mdc-snackbar-supporting-text-color: #ffffff;
+    --mat-snack-bar-button-color: #a7f3d0;
+  }
+
+  &.ems-snackbar-error {
+    --mdc-snackbar-container-color: #991b1b;
+    --mdc-snackbar-supporting-text-color: #ffffff;
+    --mat-snack-bar-button-color: #fecaca;
+  }
+
+  &.ems-snackbar-info {
+    --mdc-snackbar-container-color: #1e40af;
+    --mdc-snackbar-supporting-text-color: #ffffff;
+    --mat-snack-bar-button-color: #bfdbfe;
+  }
+}

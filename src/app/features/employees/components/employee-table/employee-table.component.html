@@ -1,0 +1,107 @@
+<div class="table-responsive-wrapper">
+  <!-- Desktop & Tablet Table View -->
+  <table
+    mat-table
+    [dataSource]="employees"
+    [trackBy]="trackByEmployeeId"
+    class="desktop-table mat-elevation-z0"
+    aria-label="Employees table"
+  >
+    <!-- ID Column -->
+    <ng-container matColumnDef="id">
+      <th mat-header-cell *matHeaderCellDef scope="col" class="th-id">ID</th>
+      <td mat-cell *matCellDef="let emp" class="td-id">
+        <span class="id-badge">#{{ emp.id }}</span>
+      </td>
+    </ng-container>
+
+    <!-- Name Column with Avatar -->
+    <ng-container matColumnDef="name">
+      <th mat-header-cell *matHeaderCellDef scope="col" class="th-name">Name</th>
+      <td mat-cell *matCellDef="let emp" class="td-name">
+        <div class="name-cell">
+          <div class="avatar-circle" [attr.aria-hidden]="true">
+            {{ emp.name.charAt(0).toUpperCase() }}
+          </div>
+          <div class="name-info">
+            <span class="full-name">{{ emp.name }}</span>
+          </div>
+        </div>
+      </td>
+    </ng-container>
+
+    <!-- Email Column -->
+    <ng-container matColumnDef="email">
+      <th mat-header-cell *matHeaderCellDef scope="col" class="th-email">Email</th>
+      <td mat-cell *matCellDef="let emp" class="td-email">
+        <span class="email-text text-truncate" [title]="emp.email">{{ emp.email }}</span>
+      </td>
+    </ng-container>
+
+    <!-- Mobile Column -->
+    <ng-container matColumnDef="mobile">
+      <th mat-header-cell *matHeaderCellDef scope="col" class="th-mobile">Mobile</th>
+      <td mat-cell *matCellDef="let emp" class="td-mobile">
+        <span class="mobile-text">{{ emp.mobile }}</span>
+      </td>
+    </ng-container>
+
+    <!-- Country Column -->
+    <ng-container matColumnDef="country">
+      <th mat-header-cell *matHeaderCellDef scope="col" class="th-country">Country</th>
+      <td mat-cell *matCellDef="let emp" class="td-country">
+        <span class="country-pill">{{ emp.country }}</span>
+      </td>
+    </ng-container>
+
+    <!-- Location (State / District) Column -->
+    <ng-container matColumnDef="location">
+      <th mat-header-cell *matHeaderCellDef scope="col" class="th-location">State & District</th>
+      <td mat-cell *matCellDef="let emp" class="td-location">
+        <span class="location-text">{{ emp.state }} <span class="divider">/</span> {{ emp.district }}</span>
+      </td>
+    </ng-container>
+
+    <!-- Actions Column -->
+    <ng-container matColumnDef="actions">
+      <th mat-header-cell *matHeaderCellDef scope="col" class="th-actions text-end">Actions</th>
+      <td mat-cell *matCellDef="let emp" class="td-actions text-end">
+        <div class="action-buttons">
+          <button
+            mat-icon-button
+            color="primary"
+            class="edit-action-btn"
+            matTooltip="Edit employee {{ emp.name }}"
+            aria-label="Edit employee"
+            (click)="onEdit(emp)"
+          >
+            <mat-icon>edit</mat-icon>
+          </button>
+          <button
+            mat-icon-button
+            color="warn"
+            class="delete-action-btn"
+            matTooltip="Delete employee {{ emp.name }}"
+            aria-label="Delete employee"
+            (click)="onDelete(emp)"
+          >
+            <mat-icon>delete_outline</mat-icon>
+          </button>
+        </div>
+      </td>
+    </ng-container>
+
+    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+    <tr mat-row *matRowDef="let row; columns: displayedColumns" class="table-row"></tr>
+  </table>
+
+  <!-- Mobile Card List View (transforms automatically on small screens) -->
+  <div class="mobile-card-list">
+    <app-employee-mobile-card
+      *ngFor="let emp of employees; trackBy: trackByEmployeeId"
+      [employee]="emp"
+      (edit)="onEdit($event)"
+      (delete)="onDelete($event)"
+    ></app-employee-mobile-card>
+  </div>
+</div>
