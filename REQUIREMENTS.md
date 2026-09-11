@@ -188,26 +188,26 @@ These functions handle data normalization, trimming, fallback values, and API-to
 
 ```text
 src/
-└── app/
-    ├── core/
-    │   ├── interceptors/
-    │   ├── models/
-    │   ├── services/
-    │   └── validators/
-    ├── shared/
-    │   └── components/
-    ├── features/
-    │   ├── dashboard/
-    │   └── employees/
-    ├── layout/
-    ├── store/
-    │   ├── employees/
-    │   └── countries/
-    ├── app.component.ts
-    ├── app.routes.ts
-    └── app.config.ts
-├── environments/
-└── styles.scss
+|-- app/
+|   |-- core/
+|   |   |-- interceptors/
+|   |   |-- models/
+|   |   |-- services/
+|   |   `-- validators/
+|   |-- shared/
+|   |   `-- components/
+|   |-- features/
+|   |   |-- dashboard/
+|   |   `-- employees/
+|   |-- layout/
+|   |-- store/
+|   |   |-- employees/
+|   |   `-- countries/
+|   |-- app.component.ts
+|   |-- app.routes.ts
+|   `-- app.config.ts
+|-- environments/
+`-- styles.scss
 ```
 
 ## API Configuration
